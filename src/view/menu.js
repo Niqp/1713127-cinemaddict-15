@@ -1,4 +1,6 @@
-export const createMenuTemplate = (watchlistMovies,historyListMovies,favoriteMovies) => (
+import { createElement } from '../utils.js';
+
+const getMenuTemplate = (watchlistMovies,historyListMovies,favoriteMovies) => (
   `<nav class="main-navigation">
     <div class="main-navigation__items">
       <a href="#all" class="main-navigation__item main-navigation__item--active">All movies</a>
@@ -7,6 +9,30 @@ export const createMenuTemplate = (watchlistMovies,historyListMovies,favoriteMov
       <a href="#favorites" class="main-navigation__item">Favorites <span class="main-navigation__item-count">${favoriteMovies.length}</span></a>
     </div>
     <a href="#stats" class="main-navigation__additional">Stats</a>
-  </nav>
-`
+  </nav>`
 );
+
+export default class MainMenu {
+  constructor(watchlistMovies,historyListMovies,favoriteMovies) {
+    this._element = null;
+    this._watchlistMovies = watchlistMovies;
+    this._historyListMovies = historyListMovies;
+    this._favoriteMovies = favoriteMovies;
+  }
+
+  getTemplate() {
+    return getMenuTemplate(this._watchlistMovies,this._historyListMovies,this._favoriteMovies);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
