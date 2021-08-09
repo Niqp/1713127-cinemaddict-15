@@ -1,13 +1,9 @@
-export const createCardPopupTemplate = (film) => {
-  const {poster,title,originalTitle,rating,director,writers,actors,releaseDate,country,duration,genres,ageRestriction,description,comments,isInWatchlist,isWatched,isFavorite} = film;
+import { generateElements } from '../utils.js';
+import { emotes } from '../const.js';
+import { createElement } from '../utils.js';
 
-  const generateElements = (elements,template) => {
-    const generatedElements = new Array;
-    elements.forEach((element) => {
-      generatedElements.push(template(element));
-    });
-    return generatedElements;
-  };
+const getCardPopupTemplate = (film) => {
+  const {poster,title,originalTitle,rating,director,writers,actors,releaseDate,country,duration,genres,ageRestriction,description,comments,isInWatchlist,isWatched,isFavorite} = film;
 
   const genreTemplate = (element) => (
     `<span class="film-details__genre">${element}</span>`
@@ -16,7 +12,7 @@ export const createCardPopupTemplate = (film) => {
   const commentTemplate = (element) => (
     `<li class="film-details__comment">
     <span class="film-details__comment-emoji">
-      <img src="./images/emoji/${element.emote}" width="55" height="55" alt="emoji-smile">
+      <img src="./images/emoji/${element.emote}.png" width="55" height="55" alt="emoji-${element.emote}">
     </span>
     <div>
       <p class="film-details__comment-text">${element.message}</p>
@@ -28,8 +24,18 @@ export const createCardPopupTemplate = (film) => {
     </div>
   </li>`
   );
+
+  const availableEmotesTemplate = (element) => (
+    `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${element}" value="${element}">
+    <label class="film-details__emoji-label" for="emoji-${element}">
+      <img src="./images/emoji/${element}.png" width="30" height="30" alt="emoji-${element}">
+    </label>`
+  );
+
   const generatedGenres = generateElements(genres,genreTemplate);
   const generatedComments = generateElements(comments,commentTemplate);
+  const generatedEmotes = generateElements(emotes,availableEmotesTemplate);
+
 
   return `<section class="film-details">
     <form class="film-details__inner" action="" method="get">
@@ -110,31 +116,11 @@ export const createCardPopupTemplate = (film) => {
 
           <div class="film-details__new-comment">
             <div class="film-details__add-emoji-label"></div>
-
-            <label class="film-details__comment-label">
-              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
-            </label>
-
-            <div class="film-details__emoji-list">
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
-              <label class="film-details__emoji-label" for="emoji-smile">
-                <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
+              <label class="film-details__comment-label">
+                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
               </label>
-
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping">
-              <label class="film-details__emoji-label" for="emoji-sleeping">
-                <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
-              </label>
-
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke">
-              <label class="film-details__emoji-label" for="emoji-puke">
-                <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
-              </label>
-
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry">
-              <label class="film-details__emoji-label" for="emoji-angry">
-                <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
-              </label>
+              <div class="film-details__emoji-list">
+              ${generatedEmotes.join('')}
             </div>
           </div>
         </section>
@@ -143,3 +129,26 @@ export const createCardPopupTemplate = (film) => {
   </section>
 `;
 };
+
+export default class CardPopup {
+  constructor(film) {
+    this._element = null;
+    this._film = film;
+  }
+
+  getTemplate() {
+    return getCardPopupTemplate(this._film);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

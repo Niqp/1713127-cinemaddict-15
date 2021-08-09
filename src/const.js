@@ -1,3 +1,8 @@
+export const renderPosition = {
+  AFTERBEGIN: 'afterbegin',
+  BEFOREEND: 'beforeend',
+};
+
 export const NO_FILMS_MESSAGE = 'There are no movies in our database';
 
 export const mockFilms = [
@@ -63,10 +68,10 @@ export const mockPeople = [
 ];
 
 export const emotes = [
-  'angry.png',
-  'puke.png',
-  'sleeping.png',
-  'smile.png',
+  'angry',
+  'puke',
+  'sleeping',
+  'smile',
 ];
 
 export const ranks = [

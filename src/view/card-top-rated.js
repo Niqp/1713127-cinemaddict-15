@@ -1,4 +1,6 @@
-export const createCardTopRatedTemplate = () => (
+import { createElement } from '../utils.js';
+
+const getCardTopRatedTemplate = () => (
   `<section class="films-list films-list--extra">
     <h2 class="films-list__title">Top rated</h2>
     <div class="films-list__container">
@@ -6,3 +8,24 @@ export const createCardTopRatedTemplate = () => (
   </section>`
 );
 
+export default class TopRatedSection {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return getCardTopRatedTemplate();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
