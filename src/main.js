@@ -2,6 +2,7 @@ import MainMenuView from './view/menu';
 import SortMenuView from './view/menu-sort';
 import ProfileView from './view/profile';
 import FilmContainerView from './view/card-container';
+import FilmEmptyContainerView from './view/empty-list';
 import TopRatedSectionView from './view/card-top-rated';
 import MostCommentedSectionView from './view/card-most-commented';
 import CardView from './view/card';
@@ -10,8 +11,8 @@ import CardPopupView from './view/card-popup';
 import FooterStatsView from './view/footer-stats';
 import Film from './mock/generate-film';
 import { calculateRank } from './profile-rank';
-import { ranks, NO_FILMS_MESSAGE, renderPosition } from './const';
-import { getTopRatedMovies,getMostCommentedMovies,getWatchlistMovies,getHistoryListMovies,getFavoriteMovies} from './filters.js';
+import { ranks, NO_FILMS_MESSAGES, renderPosition } from './const';
+import { getTopRatedMovies,getMostCommentedMovies,getWatchlistMovies,getHistoryListMovies,getFavoriteMovies} from './filters';
 import { renderElement, makePopupToggle } from './utils';
 
 const CARDS_TO_GENERATE = 15;
@@ -55,16 +56,15 @@ const siteRender = () => {
     mainElement,
     new SortMenuView().getElement(),
     renderPosition.BEFOREEND);
-  renderElement(
-    mainElement,
-    new FilmContainerView().getElement(),
-    renderPosition.BEFOREEND);
-
-  const films = mainElement.querySelector('.films');
-  const filmsList = films.querySelector('.films-list');
-  const cardContainer = films.querySelector('.films-list__container');
 
   const renderFilmList = () => {
+    renderElement(
+      mainElement,
+      new FilmContainerView().getElement(),
+      renderPosition.BEFOREEND);
+    const films = mainElement.querySelector('.films');
+    const filmsList = films.querySelector('.films-list');
+    const cardContainer = films.querySelector('.films-list__container');
     const showMoreButton = new ButtonShowMoreView();
     renderElement(
       filmsList,
@@ -73,7 +73,7 @@ const siteRender = () => {
     const showMoreButtonClass = filmsList.querySelector('.films-list__show-more');
 
     const renderCards = (container,cards,amount,removeAvailable) => {
-      const cardsToRender = (CARDS_TO_GENERATE-generatedCardsCount) >= amount ? amount : (CARDS_TO_GENERATE-generatedCardsCount);
+      const cardsToRender = removeAvailable ? Math.min((CARDS_TO_GENERATE-generatedCardsCount),amount) : Math.min(cards.length,amount);
       let cardCounter = removeAvailable ? generatedCardsCount : 0;
       for (let i = 0; i < cardsToRender; i++) {
         const currentCard = new CardView(cards[cardCounter]);
@@ -131,16 +131,10 @@ const siteRender = () => {
   if (renderedCards.length >= 1) {
     renderFilmList();
   } else {
-    const noFilmsError = document.createElement('p');
-    noFilmsError.textContent = NO_FILMS_MESSAGE;
-    cardContainer.append(noFilmsError);
+    renderElement(
+      mainElement,
+      new FilmEmptyContainerView(NO_FILMS_MESSAGES.noMovies).getElement(),
+      renderPosition.BEFOREEND);
   }
-
-//   renderElement(
-//     bodyElement,
-//     new CardPopupView(renderedCards[0]).getElement(),
-//     renderPosition.BEFOREEND);
-// };
 };
 siteRender();
-
