@@ -3,7 +3,12 @@ export const renderPosition = {
   BEFOREEND: 'beforeend',
 };
 
-export const NO_FILMS_MESSAGE = 'There are no movies in our database';
+export const NO_FILMS_MESSAGES = {
+  noMovies: 'There are no movies in our database.',
+  noWatchlist: 'There are no movies to watch now.',
+  noHistory: 'There are no watched movies now.',
+  noFavorites: 'There are no favorite movies now.',
+};
 
 export const mockFilms = [
   {
