@@ -97,3 +97,9 @@ export const ranks = [
   },
 ];
 
+export const CARDS = {
+  cardsToGenerate: 15,
+  cardsToRender: 5,
+  extraCardsToRender: 2,
+};
+

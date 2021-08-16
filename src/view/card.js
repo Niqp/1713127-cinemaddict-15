@@ -1,4 +1,6 @@
-import { createElement } from '../utils.js';
+import AbstractView from './abstract-view';
+import CardPopupView from './card-popup';
+import { renderElement } from '../render';
 
 const getCardTemplate = (film) => {
   const {poster, title, description, rating, year, duration, genres, comments, isInWatchlist, isWatched, isFavorite} = film;
@@ -24,26 +26,39 @@ const getCardTemplate = (film) => {
   </article>`;
 };
 
-export default class Card {
+export default class Card extends AbstractView {
   constructor(film) {
-    this._element = null;
+    super();
     this._film = film;
+    this._links = {
+      poster: this.getElement().querySelector('.film-card__poster'),
+      title: this.getElement().querySelector('.film-card__title'),
+      comments: this.getElement().querySelector('.film-card__comments'),
+    };
+    this._popup = new CardPopupView(this._film);
   }
 
   getTemplate() {
     return getCardTemplate(this._film);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
+  addClickHandler(position) {
+    const onPopupClick = () => {
+      const currentOpenPopup = document.querySelector('.film-details');
+      const isSamePopup = currentOpenPopup === this._popup.getElement();
+      if (!isSamePopup) {
+        if (currentOpenPopup) {
+          currentOpenPopup.remove();
+        }
+        renderElement(this._bodyElement,this._popup,position);
+        this._popup.closeCurrentPopup();
+        this._bodyElement.classList.add('hide-overflow');
+      }
+    };
 
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+    Object.entries(this._links).forEach((entry) => {
+      entry[1].style.cursor = 'pointer';
+      entry[1].addEventListener('click',onPopupClick);
+    });
   }
 }
-

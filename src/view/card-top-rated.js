@@ -1,4 +1,5 @@
-import { createElement } from '../utils.js';
+import FilmContainer from './card-container';
+import { CARDS } from '../const';
 
 const getCardTopRatedTemplate = () => (
   `<section class="films-list films-list--extra">
@@ -8,24 +9,13 @@ const getCardTopRatedTemplate = () => (
   </section>`
 );
 
-export default class TopRatedSection {
-  constructor() {
-    this._element = null;
+export default class TopRatedSection extends FilmContainer {
+  constructor(cards,removeAvailable) {
+    super(cards,removeAvailable);
+    this._amount = CARDS.extraCardsToRender;
   }
 
   getTemplate() {
     return getCardTopRatedTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

@@ -1,5 +1,4 @@
 import dayjs from 'dayjs';
-import { renderPosition } from './const.js';
 // const ALERT_SHOW_TIME = 5000;
 // const ALERT_ANIMATION_DELAY = 500;
 const DEBOUNCE_DELAY = 500;
@@ -107,74 +106,4 @@ export const generateElements = (elements,template) => {
     generatedElements.push(template(element));
   });
   return generatedElements;
-};
-
-export const renderElement = (container, element, place) => {
-  switch (place) {
-    case renderPosition.AFTERBEGIN:
-      container.prepend(element);
-      break;
-    case renderPosition.BEFOREEND:
-      container.append(element);
-      break;
-  }
-};
-
-export const createElement = (template) => {
-  const newElement = document.createElement('div');
-  newElement.innerHTML = template;
-  return newElement.firstElementChild;
-};
-
-export const makePopupToggle = (clickArea,popup,renderContainer,position,button) => {
-  let isToggled = false;
-  let togglePopup = null;
-
-  const closeCurrentPopup = () => {
-    let onKeyPress = null;
-    let onClick = null;
-    const closeMessage = () => {
-      popup.remove();
-      document.removeEventListener('keydown',onKeyPress);
-      if (button) {
-        button.removeEventListener('click', onClick);
-      }
-      renderContainer.classList.remove('hide-overflow');
-      togglePopup();
-    };
-    onKeyPress = (evt) => {
-      if (evt.key === 'Escape') {
-        closeMessage();
-      }
-    };
-    onClick = () => {
-      closeMessage();
-    };
-    document.addEventListener('keydown',onKeyPress);
-    if (button) {
-      button.addEventListener('click', onClick);
-    }
-  };
-
-  const openPopup = () => {
-    const onPopupClick = () => {
-      renderElement(renderContainer,popup,position);
-      clickArea.removeEventListener('click',onPopupClick);
-      renderContainer.classList.add('hide-overflow');
-      togglePopup();
-    };
-    clickArea.addEventListener('click',onPopupClick);
-  };
-
-  togglePopup = () => {
-    if (!isToggled) {
-      openPopup(clickArea,popup,renderContainer,position);
-      isToggled = true;
-    } else {
-      closeCurrentPopup(popup,button);
-      isToggled = false;
-    }
-  };
-
-  togglePopup();
 };
