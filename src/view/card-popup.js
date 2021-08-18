@@ -1,6 +1,7 @@
 import { generateElements } from '../utils.js';
 import { emotes } from '../const.js';
-import { createElement } from '../utils.js';
+import AbstractView from './abstract-view';
+import { remove } from '../render.js';
 
 const getCardPopupTemplate = (film) => {
   const {poster,title,originalTitle,rating,director,writers,actors,releaseDate,country,duration,genres,ageRestriction,description,comments,isInWatchlist,isWatched,isFavorite} = film;
@@ -130,9 +131,9 @@ const getCardPopupTemplate = (film) => {
 `;
 };
 
-export default class CardPopup {
+export default class CardPopup extends AbstractView {
   constructor(film) {
-    this._element = null;
+    super();
     this._film = film;
   }
 
@@ -140,15 +141,25 @@ export default class CardPopup {
     return getCardPopupTemplate(this._film);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  closeCurrentPopup () {
+    const popupCloseButton = this.getElement().querySelector('.film-details__close-btn');
+    let onKeyPress = null;
+    let onClick = null;
+    const closeMessage = () => {
+      remove(this);
+      document.removeEventListener('keydown',onKeyPress);
+      popupCloseButton.removeEventListener('click', onClick);
+      this._bodyElement.classList.remove('hide-overflow');
+    };
+    onKeyPress = (evt) => {
+      if (evt.key === 'Escape') {
+        closeMessage();
+      }
+    };
+    onClick = () => {
+      closeMessage();
+    };
+    document.addEventListener('keydown',onKeyPress);
+    popupCloseButton.addEventListener('click', onClick);
   }
 }

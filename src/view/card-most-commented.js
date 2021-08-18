@@ -1,4 +1,5 @@
-import { createElement } from '../utils.js';
+import FilmContainer from './card-container';
+import { CARDS } from '../const';
 
 const getCardMostCommentedTemplate = () => (
   `<section class="films-list films-list--extra">
@@ -8,25 +9,14 @@ const getCardMostCommentedTemplate = () => (
   </section>`
 );
 
-export default class MostCommentedSection {
-  constructor() {
-    this._element = null;
+export default class MostCommentedSection extends FilmContainer {
+  constructor(cards,removeAvailable) {
+    super(cards,removeAvailable);
+    this._amount = CARDS.extraCardsToRender;
   }
 
   getTemplate() {
     return getCardMostCommentedTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 
