@@ -1,6 +1,5 @@
 import AbstractView from './abstract-view';
 import CardPopupView from './card-popup';
-import { renderElement } from '../render';
 
 const getCardTemplate = (film) => {
   const {poster, title, description, rating, year, duration, genres, comments, isInWatchlist, isWatched, isFavorite} = film;
@@ -36,29 +35,66 @@ export default class Card extends AbstractView {
       comments: this.getElement().querySelector('.film-card__comments'),
     };
     this._popup = new CardPopupView(this._film);
+    this._clickHandler = this._clickHandler.bind(this);
+    this._watchlistHandler = this._watchlistHandler.bind(this);
+    this._watchedHandler = this._watchedHandler.bind(this);
+    this._favoriteHandler = this._favoriteHandler.bind(this);
+    this._buttons = {
+      watchlist: this.getElement().querySelector('.film-card__controls-item--add-to-watchlist'),
+      watched: this.getElement().querySelector('.film-card__controls-item--mark-as-watched'),
+      favorite: this.getElement().querySelector('.film-card__controls-item--favorite'),
+    };
   }
 
   getTemplate() {
     return getCardTemplate(this._film);
   }
 
-  addClickHandler(position) {
-    const onPopupClick = () => {
-      const currentOpenPopup = document.querySelector('.film-details');
-      const isSamePopup = currentOpenPopup === this._popup.getElement();
-      if (!isSamePopup) {
-        if (currentOpenPopup) {
-          currentOpenPopup.remove();
-        }
-        renderElement(this._bodyElement,this._popup,position);
-        this._popup.closeCurrentPopup();
-        this._bodyElement.classList.add('hide-overflow');
-      }
-    };
+  _clickHandler(evt) {
+    evt.preventDefault();
+    this._callback.click();
+  }
 
+  _watchlistHandler(evt) {
+    evt.preventDefault();
+    this._callback.watchlistChange();
+  }
+
+  _watchedHandler(evt) {
+    evt.preventDefault();
+    this._callback.watchedChange();
+  }
+
+  _favoriteHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoriteChange();
+  }
+
+
+  setClickHandler(callback) {
+    this._callback.click = callback;
     Object.entries(this._links).forEach((entry) => {
-      entry[1].style.cursor = 'pointer';
-      entry[1].addEventListener('click',onPopupClick);
+      const entryValue = entry[1];
+      entryValue.style.cursor = 'pointer';
+      entryValue.addEventListener('click',this._clickHandler);
     });
+  }
+
+  setWatchlistHandler(callback) {
+    this._callback.watchlistChange = callback;
+    this._buttons.watchlist.style.cursor = 'pointer';
+    this._buttons.watchlist.addEventListener('click',this._watchlistHandler);
+  }
+
+  setWatchedHandler(callback) {
+    this._callback.watchedChange = callback;
+    this._buttons.watched.style.cursor = 'pointer';
+    this._buttons.watched.addEventListener('click',this._watchedHandler);
+  }
+
+  setFavoriteHandler(callback) {
+    this._callback.favoriteChange = callback;
+    this._buttons.favorite.style.cursor = 'pointer';
+    this._buttons.favorite.addEventListener('click',this._favoriteHandler);
   }
 }

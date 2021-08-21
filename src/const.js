@@ -1,13 +1,13 @@
-export const renderPosition = {
+export const RenderPosition = {
   AFTERBEGIN: 'afterbegin',
   BEFOREEND: 'beforeend',
 };
 
-export const NO_FILMS_MESSAGES = {
-  noMovies: 'There are no movies in our database.',
-  noWatchlist: 'There are no movies to watch now.',
-  noHistory: 'There are no watched movies now.',
-  noFavorites: 'There are no favorite movies now.',
+export const NoFilmsMessages = {
+  NO_MOVIES: 'There are no movies in our database.',
+  NO_WATCHLIST: 'There are no movies to watch now.',
+  NO_HISTORY: 'There are no watched movies now.',
+  NO_FAVORITES: 'There are no favorite movies now.',
 };
 
 export const mockFilms = [
@@ -97,9 +97,9 @@ export const ranks = [
   },
 ];
 
-export const CARDS = {
-  cardsToGenerate: 15,
-  cardsToRender: 5,
-  extraCardsToRender: 2,
+export const Cards = {
+  CARDS_TO_GENERATE: 14,
+  CARDS_TO_RENDER: 5,
+  EXTRA_CARDS_TO_RENDER: 2,
 };
 

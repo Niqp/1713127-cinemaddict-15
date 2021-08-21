@@ -1,5 +1,6 @@
 import { getRandomInteger, getRandomFloat, getRandomArrayElement, getRandomArrayQuantity, getRandomArrayItems, createDateWithGap } from '../utils.js';
 import { mockFilms, mockText, mockGenres, mockPeople, emotes } from '../const.js';
+import { nanoid } from 'nanoid';
 
 
 const DAYS_GAP = 7;
@@ -17,6 +18,7 @@ export default class Film {
     const descriptionLength = getRandomInteger(1,5);
     const genresLength = getRandomInteger(1,3);
     const releaseYear = getRandomInteger(1895,2021);
+    this.id = nanoid();
     this.poster = mockFilms[filmIndex].poster;
     this.title = mockFilms[filmIndex].title;
     this.originalTitle = mockFilms[filmIndex].title;

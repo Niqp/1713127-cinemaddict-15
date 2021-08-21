@@ -1,5 +1,5 @@
 import FilmContainer from './card-container';
-import { CARDS } from '../const';
+import { Cards } from '../const';
 
 const getCardTopRatedTemplate = () => (
   `<section class="films-list films-list--extra">
@@ -12,7 +12,7 @@ const getCardTopRatedTemplate = () => (
 export default class TopRatedSection extends FilmContainer {
   constructor(cards,removeAvailable) {
     super(cards,removeAvailable);
-    this._amount = CARDS.extraCardsToRender;
+    this._amount = Cards.EXTRA_CARDS_TO_RENDER;
   }
 
   getTemplate() {
