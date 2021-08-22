@@ -97,9 +97,14 @@ export const ranks = [
   },
 ];
 
-export const Cards = {
+export const CardNumber = {
   CARDS_TO_GENERATE: 14,
   CARDS_TO_RENDER: 5,
   EXTRA_CARDS_TO_RENDER: 2,
 };
 
+export const SortType = {
+  DEFAULT: 'DEFAULT',
+  DATE: 'DATE',
+  RATING: 'RATING',
+};

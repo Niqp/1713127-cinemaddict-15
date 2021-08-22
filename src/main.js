@@ -1,12 +1,11 @@
 import MainMenuView from './view/menu';
-import SortMenuView from './view/menu-sort';
 import ProfileView from './view/profile';
 // import TopRatedSectionView from './view/card-top-rated';
 // import MostCommentedSectionView from './view/card-most-commented';
 import FooterStatsView from './view/footer-stats';
 import Film from './mock/generate-film';
 import { calculateRank } from './profile-rank';
-import { ranks, RenderPosition, Cards } from './const';
+import { ranks, RenderPosition, CardNumber } from './const';
 import { getWatchlistMovies,getHistoryListMovies,getFavoriteMovies} from './filters';
 import { renderElement } from './render';
 import FilmList from './presenter/film-list';
@@ -16,7 +15,7 @@ const headerElement = document.querySelector('.header');
 const footerElement = document.querySelector('.footer');
 
 const siteRender = () => {
-  const renderedCards = new Array(Cards.CARDS_TO_GENERATE)
+  const renderedCards = new Array(CardNumber.CARDS_TO_GENERATE)
     .fill()
     .map((item) => new Film(item));
   // const currentTopRatedMovies = getTopRatedMovies(renderedCards);
@@ -41,10 +40,10 @@ const siteRender = () => {
       currentHistoryListMovies,
       currentFavoriteMovies),
     RenderPosition.BEFOREEND);
-  renderElement(
-    mainElement,
-    new SortMenuView(),
-    RenderPosition.BEFOREEND);
+  // renderElement(
+  //   mainElement,
+  //   new SortMenuView(),
+  //   RenderPosition.BEFOREEND);
 
   // const renderFilmList = () => {
   //   // const filmList = new FilmContainerView(renderedCards,true);

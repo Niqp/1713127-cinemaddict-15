@@ -131,10 +131,9 @@ const getCardPopupTemplate = (film) => {
 };
 
 export default class CardPopup extends AbstractView {
-  constructor(film,updateFilm) {
+  constructor(film) {
     super();
     this.film = film;
-    this._updateFilm = updateFilm;
     this._closeButton = this.getElement().querySelector('.film-details__close-btn');
     this._clickHandler = this._clickHandler.bind(this);
     this._watchlistHandler = this._watchlistHandler.bind(this);
