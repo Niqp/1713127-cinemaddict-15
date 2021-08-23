@@ -7,3 +7,4 @@ const getHistoryListMovies = (movies) => movies.filter((movie) => movie.isWatche
 const getFavoriteMovies = (movies) => movies.filter((movie) => movie.isFavorite);
 
 export {getTopRatedMovies, getMostCommentedMovies, getNewestMovies, getWatchlistMovies, getHistoryListMovies, getFavoriteMovies};
+
