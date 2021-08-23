@@ -1,27 +1,25 @@
 import MainMenuView from './view/menu';
-import SortMenuView from './view/menu-sort';
 import ProfileView from './view/profile';
-import FilmContainerView from './view/card-container';
-import FilmEmptyContainerView from './view/empty-list';
-import TopRatedSectionView from './view/card-top-rated';
-import MostCommentedSectionView from './view/card-most-commented';
+// import TopRatedSectionView from './view/card-top-rated';
+// import MostCommentedSectionView from './view/card-most-commented';
 import FooterStatsView from './view/footer-stats';
 import Film from './mock/generate-film';
 import { calculateRank } from './profile-rank';
-import { ranks, NO_FILMS_MESSAGES, renderPosition, CARDS } from './const';
-import { getTopRatedMovies,getMostCommentedMovies,getWatchlistMovies,getHistoryListMovies,getFavoriteMovies} from './filters';
+import { ranks, RenderPosition, CardNumber } from './const';
+import { getWatchlistMovies,getHistoryListMovies,getFavoriteMovies} from './filters';
 import { renderElement } from './render';
+import FilmList from './presenter/film-list';
 
 const mainElement = document.querySelector('.main');
 const headerElement = document.querySelector('.header');
 const footerElement = document.querySelector('.footer');
 
 const siteRender = () => {
-  const renderedCards = new Array(CARDS.cardsToGenerate)
+  const renderedCards = new Array(CardNumber.CARDS_TO_GENERATE)
     .fill()
     .map((item) => new Film(item));
-  const currentTopRatedMovies = getTopRatedMovies(renderedCards);
-  const currentMostCommentedMovies = getMostCommentedMovies(renderedCards);
+  // const currentTopRatedMovies = getTopRatedMovies(renderedCards);
+  // const currentMostCommentedMovies = getMostCommentedMovies(renderedCards);
   const currentWatchlistMovies = getWatchlistMovies(renderedCards);
   const currentHistoryListMovies = getHistoryListMovies(renderedCards);
   const currentFavoriteMovies = getFavoriteMovies(renderedCards);
@@ -29,53 +27,56 @@ const siteRender = () => {
   if (currentHistoryListMovies.length >= 1) {
     renderElement(
       headerElement,
-      new ProfileView(calculateRank(ranks, currentHistoryListMovies)),renderPosition.BEFOREEND);
+      new ProfileView(calculateRank(ranks, currentHistoryListMovies)),RenderPosition.BEFOREEND);
   }
   renderElement(
     footerElement,
     new FooterStatsView(renderedCards),
-    renderPosition.BEFOREEND);
+    RenderPosition.BEFOREEND);
   renderElement(
     mainElement,
     new MainMenuView(
       currentWatchlistMovies,
       currentHistoryListMovies,
       currentFavoriteMovies),
-    renderPosition.BEFOREEND);
-  renderElement(
-    mainElement,
-    new SortMenuView(),
-    renderPosition.BEFOREEND);
+    RenderPosition.BEFOREEND);
+  // renderElement(
+  //   mainElement,
+  //   new SortMenuView(),
+  //   RenderPosition.BEFOREEND);
 
-  const renderFilmList = () => {
-    const filmList = new FilmContainerView(renderedCards,true);
-    renderElement(
-      mainElement,
-      filmList,
-      renderPosition.BEFOREEND);
-    const films = mainElement.querySelector('.films');
-    filmList.renderCards();
-    filmList.renderShowMoreButton();
-    const renderExtraSection = (template, cards) => {
-      const currentSection = new template(cards,false);
-      renderElement(
-        films,
-        currentSection,
-        renderPosition.BEFOREEND);
-      currentSection.renderCards();
-    };
+  // const renderFilmList = () => {
+  //   // const filmList = new FilmContainerView(renderedCards,true);
+  //   // renderElement(
+  //   //   mainElement,
+  //   //   filmList,
+  //   //   renderPosition.BEFOREEND);
+  //   // filmList.renderCards();
+  //   // filmList.renderShowMoreButton();
+  //   const films = mainElement.querySelector('.films');
+  //   const renderExtraSection = (template, cards) => {
+  //     const currentSection = new template(cards,false);
+  //     renderElement(
+  //       films,
+  //       currentSection,
+  //       RenderPosition.BEFOREEND);
+  //     currentSection.renderCards();
+  //   };
 
-    renderExtraSection(MostCommentedSectionView, currentTopRatedMovies);
-    renderExtraSection(TopRatedSectionView, currentMostCommentedMovies);
-  };
+  //   renderExtraSection(MostCommentedSectionView, currentTopRatedMovies);
+  //   renderExtraSection(TopRatedSectionView, currentMostCommentedMovies);
+  // };
 
-  if (renderedCards.length >= 1) {
-    renderFilmList();
-  } else {
-    renderElement(
-      mainElement,
-      new FilmEmptyContainerView(NO_FILMS_MESSAGES.noMovies),
-      renderPosition.BEFOREEND);
-  }
+  const filmListPresenter = new FilmList(mainElement);
+  filmListPresenter.init(renderedCards);
+
+//   if (renderedCards.length >= 1) {
+//    renderFilmList();
+//   } else {
+//     renderElement(
+//       mainElement,
+//       new FilmEmptyContainerView(NO_FILMS_MESSAGES.noMovies),
+//       renderPosition.BEFOREEND);
+//   }
 };
 siteRender();

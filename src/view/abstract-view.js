@@ -6,7 +6,7 @@ export default class AbstractView {
       throw new Error('Can\'t instantiate Abstract, only concrete one.');
     }
     this._element = null;
-    this._bodyElement = document.querySelector('body');
+    this._callback = {};
   }
 
   getTemplate() {
