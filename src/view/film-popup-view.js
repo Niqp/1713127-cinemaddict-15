@@ -1,37 +1,35 @@
-import { generateElements } from '../utils.js';
+import { createCurrentDate, generateElements } from '../utils.js';
 import { emotes } from '../const.js';
-import AbstractView from './abstract-view';
+import SmartView from './smart-view.js';
+const genreTemplate = (element) => (
+  `<span class="film-details__genre">${element}</span>`
+);
 
-const getCardPopupTemplate = (film) => {
-  const {poster,title,originalTitle,rating,director,writers,actors,releaseDate,country,duration,genres,ageRestriction,description,comments,isInWatchlist,isWatched,isFavorite} = film;
+const commentTemplate = (element) => (
+  `<li class="film-details__comment">
+  <span class="film-details__comment-emoji">
+    <img src="./images/emoji/${element.emote}.png" width="55" height="55" alt="emoji-${element.emote}">
+  </span>
+  <div>
+    <p class="film-details__comment-text">${element.message}</p>
+    <p class="film-details__comment-info">
+      <span class="film-details__comment-author">${element.author}</span>
+      <span class="film-details__comment-day">${element.date}</span>
+      <button class="film-details__comment-delete">Delete</button>
+    </p>
+  </div>
+</li>`
+);
 
-  const genreTemplate = (element) => (
-    `<span class="film-details__genre">${element}</span>`
-  );
+const availableEmotesTemplate = (element) => (
+  `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${element}" value="${element}">
+  <label class="film-details__emoji-label" for="emoji-${element}">
+    <img src="./images/emoji/${element}.png" width="30" height="30" alt="emoji-${element}">
+  </label>`
+);
 
-  const commentTemplate = (element) => (
-    `<li class="film-details__comment">
-    <span class="film-details__comment-emoji">
-      <img src="./images/emoji/${element.emote}.png" width="55" height="55" alt="emoji-${element.emote}">
-    </span>
-    <div>
-      <p class="film-details__comment-text">${element.message}</p>
-      <p class="film-details__comment-info">
-        <span class="film-details__comment-author">${element.author}</span>
-        <span class="film-details__comment-day">${element.date}</span>
-        <button class="film-details__comment-delete">Delete</button>
-      </p>
-    </div>
-  </li>`
-  );
-
-  const availableEmotesTemplate = (element) => (
-    `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${element}" value="${element}">
-    <label class="film-details__emoji-label" for="emoji-${element}">
-      <img src="./images/emoji/${element}.png" width="30" height="30" alt="emoji-${element}">
-    </label>`
-  );
-
+const getCardPopupTemplate = (state) => {
+  const {poster,title,originalTitle,rating,director,writers,actors,releaseDate,country,duration,genres,ageRestriction,description,comments,isInWatchlist,isWatched,isFavorite,newCommentEmote,newCommentMessage} = state;
   const generatedGenres = generateElements(genres,genreTemplate);
   const generatedComments = generateElements(comments,commentTemplate);
   const generatedEmotes = generateElements(emotes,availableEmotesTemplate);
@@ -115,9 +113,9 @@ const getCardPopupTemplate = (film) => {
           </ul>
 
           <div class="film-details__new-comment">
-            <div class="film-details__add-emoji-label"></div>
+            <div class="film-details__add-emoji-label">${newCommentEmote ? `<img src="images/emoji/${newCommentEmote}.png" width="55" height="55" alt="emoji-smile">` : ''}</div>
               <label class="film-details__comment-label">
-                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${newCommentMessage ? newCommentMessage : ''}</textarea>
               </label>
               <div class="film-details__emoji-list">
               ${generatedEmotes.join('')}
@@ -130,50 +128,134 @@ const getCardPopupTemplate = (film) => {
 `;
 };
 
-export default class CardPopup extends AbstractView {
+export default class CardPopup extends SmartView {
   constructor(film) {
     super();
-    this.film = film;
-    this._closeButton = this.getElement().querySelector('.film-details__close-btn');
-    this._clickHandler = this._clickHandler.bind(this);
+    this.currentId = film.id;
+    this._checkedEmote = null;
+    this._state = CardPopup.parseFilmToState(film);
+    this._closeButtonClickHandler = this._closeButtonClickHandler.bind(this);
     this._watchlistHandler = this._watchlistHandler.bind(this);
     this._watchedHandler = this._watchedHandler.bind(this);
     this._favoriteHandler = this._favoriteHandler.bind(this);
-    this._buttons = {
-      watchlist: this.getElement().querySelector('.film-details__control-button--watchlist'),
-      watched: this.getElement().querySelector('.film-details__control-button--watched'),
-      favorite: this.getElement().querySelector('.film-details__control-button--favorite'),
-    };
+    this._newCommentEmoteChangeHandler = this._newCommentEmoteChangeHandler.bind(this);
+    this._newCommentTextAreaHandler = this._newCommentTextAreaHandler.bind(this);
+    this._newCommentSendHandler = this._newCommentSendHandler.bind(this);
+    this._getHandledElements();
+    this._setInnerHandlers();
 
   }
 
   getTemplate() {
-    return getCardPopupTemplate(this.film);
+    return getCardPopupTemplate(this._state);
   }
 
-  _clickHandler(evt) {
+  restoreHandlers() {
+    this._getHandledElements();
+    this._setInnerHandlers();
+    this._restoreOuterHandlers();
+
+  }
+
+  _getHandledElements() {
+    this._buttons = {
+      closePopup: this.getElement().querySelector('.film-details__close-btn'),
+      watchlist: this.getElement().querySelector('.film-details__control-button--watchlist'),
+      watched: this.getElement().querySelector('.film-details__control-button--watched'),
+      favorite: this.getElement().querySelector('.film-details__control-button--favorite'),
+    };
+    this._emotes = this.getElement().querySelectorAll('.film-details__emoji-item');
+    this._textArea = this.getElement().querySelector('.film-details__comment-input');
+
+  }
+
+  _setInnerHandlers() {
+    for (const emote of this._emotes) {
+      if (emote.value === this._checkedEmote) {
+        emote.checked = true;
+      }
+      emote.addEventListener('click', this._newCommentEmoteChangeHandler);
+    }
+    this._textArea.addEventListener('input',this._newCommentTextAreaHandler);
+  }
+
+  _restoreOuterHandlers() {
+    this.setCloseButtonClickHandler(this._callback.closeButtonClick);
+    this.setWatchlistHandler(this._callback.watchlistChange);
+    this.setWatchedHandler(this._callback.watchedChange);
+    this.setFavoriteHandler(this._callback.favoriteChange);
+    this.setCommentSendHandler(this._callback.newCommentSend);
+  }
+
+  _closeButtonClickHandler(evt) {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.closeButtonClick();
   }
 
   _watchlistHandler(evt) {
     evt.preventDefault();
-    this._callback.watchlistChange(this.film);
+    this._callback.watchlistChange(CardPopup.parseStateToFilm(this._state));
   }
 
   _watchedHandler(evt) {
     evt.preventDefault();
-    this._callback.watchedChange(this.film);
+    this._callback.watchedChange(CardPopup.parseStateToFilm(this._state));
   }
 
   _favoriteHandler(evt) {
     evt.preventDefault();
-    this._callback.favoriteChange(this.film);
+    this._callback.favoriteChange(CardPopup.parseStateToFilm(this._state));
   }
 
-  setClickHandler(callback) {
-    this._callback.click = callback;
-    this._closeButton.addEventListener('click', this._clickHandler);
+  _newCommentEmoteChangeHandler(evt) {
+    evt.preventDefault();
+    if (evt.target.value !== this._state.newCommentEmote) {
+      this._checkedEmote = evt.target.value;
+      this.updateState(
+        {
+          isNewCommentEmote: true,
+          newCommentEmote: this._checkedEmote,
+        },
+      );
+    }
+  }
+
+  _newCommentTextAreaHandler(evt) {
+    evt.preventDefault();
+    this.updateState(
+      {
+        newCommentMessage: evt.target.value,
+      }, true,
+    );
+  }
+
+  _newCommentSendHandler(evt) {
+    if (evt.ctrlKey && evt.key === 'Enter') {
+      evt.preventDefault();
+      if (this._state.newCommentEmote && this._state.newCommentMessage) {
+        this._newComment = {
+          emote: this._state.newCommentEmote,
+          date: createCurrentDate(),
+          author: 'Неопознанный Енот',
+          message: this._state.newCommentMessage,
+        };
+        this._state.comments.push(this._newComment);
+        this._state.newCommentMessage = null;
+        this._state.newCommentEmote = null;
+        this._callback.newCommentSend(CardPopup.parseStateToFilm(this._state));
+      }
+    }
+  }
+
+  setCommentSendHandler(callback) {
+    this._callback.newCommentSend = callback;
+    this._textArea.addEventListener('keydown',this._newCommentSendHandler);
+
+  }
+
+  setCloseButtonClickHandler(callback) {
+    this._callback.closeButtonClick = callback;
+    this._buttons.closePopup.addEventListener('click', this._closeButtonClickHandler);
   }
 
   setWatchlistHandler(callback) {
@@ -194,5 +276,24 @@ export default class CardPopup extends AbstractView {
     this._buttons.favorite.addEventListener('click',this._favoriteHandler);
   }
 
+  static parseFilmToState(film) {
+    return Object.assign(
+      {},
+      film,
+      {
+        isNewComment: false,
+        newCommentEmote: null,
+        newCommentMessage: null,
+      },
+    );
+  }
 
+  static parseStateToFilm(state) {
+    state = Object.assign({}, state);
+
+    delete state.newCommentEmote;
+    delete state.newCommentMessage;
+    delete state.isNewComment;
+    return state;
+  }
 }

@@ -1,9 +1,9 @@
-import FilmContainerView from '../view/card-container';
+import FilmContainerView from '../view/film-container';
 import FilmEmptyContainerView from '../view/empty-list';
 import ButtonShowMore from '../view/button-show-more';
 import SortMenu from '../view/menu-sort';
-import FilmPresenter from './film';
-import PopupPresenter from './film-popup';
+import FilmPresenter from './film-presenter';
+import PopupPresenter from './film-popup-presenter';
 import { RenderPosition, CardNumber, NoFilmsMessages, SortType } from '../const';
 import { renderElement, remove } from '../render';
 import { updateItem } from '../utils';
@@ -23,7 +23,6 @@ export default class FilmList {
     this._handleFilmSorting = this._handleFilmSorting.bind(this);
     this._generatedCardsCount = 0;
     this._currentSortMethod = SortType.DEFAULT;
-    this._bodyElement = document.querySelector('body');
   }
 
   init(films) {
@@ -92,7 +91,7 @@ export default class FilmList {
 
   _handlePopupAdd(filmId) {
     if (this._currentPopup.currentPopupComponent) {
-      if (this._currentPopup.currentPopupComponent.film.id === filmId) {
+      if (this._currentPopup.currentPopupComponent.currentId === filmId) {
         return;
       }
       this._currentPopup.destroy();
@@ -121,8 +120,10 @@ export default class FilmList {
   _handleFilmUpdate(updatedFilm) {
     this._films = updateItem(this._films,updatedFilm);
     this._filmPresenter.get(updatedFilm.id).init(updatedFilm);
-    if (this._currentPopup.currentPopupComponent && this._currentPopup.currentPopupComponent.film.id === updatedFilm.id) {
-      this._currentPopup.init(updatedFilm);
+    if (this._currentPopup.currentPopupComponent && this._currentPopup.currentPopupComponent.currentId === updatedFilm.id) {
+      const savedY = this._currentPopup.getCurrentY();
+      this._currentPopup.updatePopup(updatedFilm);
+      this._currentPopup.setCurrentY(savedY);
 
     }
   }

@@ -100,6 +100,8 @@ export const shuffle = (array) => {
 
 export const createDateWithGap = (gap) => dayjs().add(gap, 'day').format('YYYY/MMMM/DD HH:MM');
 
+export const createCurrentDate = () => dayjs().format('YYYY/MMMM/DD HH:MM');
+
 export const generateElements = (elements,template) => {
   const generatedElements = new Array;
   elements.forEach((element) => {

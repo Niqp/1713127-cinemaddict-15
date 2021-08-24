@@ -1,4 +1,4 @@
-import CardView from '../view/card';
+import CardView from '../view/film-view';
 import { RenderPosition } from '../const';
 import { remove, replace, renderElement } from '../render';
 

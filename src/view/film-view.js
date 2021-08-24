@@ -1,5 +1,5 @@
 import AbstractView from './abstract-view';
-import CardPopupView from './card-popup';
+import CardPopupView from './film-popup-view';
 
 const getCardTemplate = (film) => {
   const {poster, title, description, rating, year, duration, genres, comments, isInWatchlist, isWatched, isFavorite} = film;
