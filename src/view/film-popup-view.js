@@ -1,5 +1,5 @@
 import { createCurrentDate, generateElements, createDurationMinutes, formatDate, getTimeFromNow } from '../utils.js';
-import { CommentDateText, DateFormats, emotes } from '../const.js';
+import { DateFormats, emotes } from '../const.js';
 import SmartView from './smart-view.js';
 const genreTemplate = (element) => (
   `<span class="film-details__genre">${element}</span>`
