@@ -10,6 +10,23 @@ export const NoFilmsMessages = {
   NO_FAVORITES: 'There are no favorite movies now.',
 };
 
+export const DateFormats = {
+  DEFAULT: 'YYYY/MMMM/DD HH:MM',
+  TO_YEAR: 'YYYY',
+  TO_DAY: 'D MMMM YYYY',
+  HOURS_AND_MINUTES: 'H[h] mm[m]',
+};
+
+export const CommentDateText = {
+  NOW: 'Just now',
+  SECONDS: 'seconds ago',
+  MINUTES: 'minutes ago',
+  HOURS: 'hours ago',
+  DAYS: 'days ago',
+  MONTH: 'months ago',
+  YEAR: 'years ago',
+};
+
 export const mockFilms = [
   {
     title: 'Made for Each Other',

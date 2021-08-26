@@ -1,5 +1,5 @@
-import { createCurrentDate, generateElements } from '../utils.js';
-import { emotes } from '../const.js';
+import { createCurrentDate, generateElements, createDurationMinutes, formatDate, getTimeFromNow } from '../utils.js';
+import { CommentDateText, DateFormats, emotes } from '../const.js';
 import SmartView from './smart-view.js';
 const genreTemplate = (element) => (
   `<span class="film-details__genre">${element}</span>`
@@ -14,7 +14,7 @@ const commentTemplate = (element) => (
     <p class="film-details__comment-text">${element.message}</p>
     <p class="film-details__comment-info">
       <span class="film-details__comment-author">${element.author}</span>
-      <span class="film-details__comment-day">${element.date}</span>
+      <span class="film-details__comment-day">${getTimeFromNow(element.date)}</span>
       <button class="film-details__comment-delete">Delete</button>
     </p>
   </div>
@@ -75,11 +75,11 @@ const getCardPopupTemplate = (state) => {
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Release Date</td>
-                <td class="film-details__cell">${releaseDate}</td>
+                <td class="film-details__cell">${formatDate(releaseDate,DateFormats.TO_DAY)}</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Runtime</td>
-                <td class="film-details__cell">${duration}</td>
+                <td class="film-details__cell">${formatDate(createDurationMinutes(duration),DateFormats.HOURS_AND_MINUTES)}</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Country</td>
