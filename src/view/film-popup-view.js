@@ -131,7 +131,7 @@ const getCardPopupTemplate = (state) => {
 export default class CardPopup extends SmartView {
   constructor(film) {
     super();
-    this.currentId = film.id;
+    this._currentId = film.id;
     this._checkedEmote = null;
     this._state = CardPopup.parseFilmToState(film);
     this._closeButtonClickHandler = this._closeButtonClickHandler.bind(this);
@@ -155,6 +155,10 @@ export default class CardPopup extends SmartView {
     this._setInnerHandlers();
     this._restoreOuterHandlers();
 
+  }
+
+  get currentId () {
+    return this._currentId;
   }
 
   _getHandledElements() {
