@@ -90,8 +90,8 @@ export default class FilmList {
   }
 
   _handlePopupAdd(filmId) {
-    if (this._currentPopup.currentPopupComponent) {
-      if (this._currentPopup.currentPopupComponent.currentId === filmId) {
+    if (this._currentPopup.component) {
+      if (this._currentPopup.component.currentId === filmId) {
         return;
       }
       this._currentPopup.destroy();
@@ -120,10 +120,10 @@ export default class FilmList {
   _handleFilmUpdate(updatedFilm) {
     this._films = updateItem(this._films,updatedFilm);
     this._filmPresenter.get(updatedFilm.id).init(updatedFilm);
-    if (this._currentPopup.currentPopupComponent && this._currentPopup.currentPopupComponent.currentId === updatedFilm.id) {
-      const savedY = this._currentPopup.getCurrentY();
+    if (this._currentPopup.component && this._currentPopup.component.currentId === updatedFilm.id) {
+      const savedY = this._currentPopup.currentY;
       this._currentPopup.updatePopup(updatedFilm);
-      this._currentPopup.setCurrentY(savedY);
+      this._currentPopup.currentY = savedY;
 
     }
   }

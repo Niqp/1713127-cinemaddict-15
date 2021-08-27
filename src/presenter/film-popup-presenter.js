@@ -11,54 +11,58 @@ export default class PopupPresenter {
     this._handlePopupFavoriteClick = this._handlePopupFavoriteClick.bind(this);
     this._handleNewCommentSend = this._handleNewCommentSend.bind(this);
     this._updateFilm = updateFilm;
-    this.currentPopupComponent = null;
+    this._component = null;
     this._bodyElement = document.querySelector('body');
 
   }
 
   init(film) {
     this.film = film;
-    const oldPopupComponent = this.currentPopupComponent;
-    this.currentPopupComponent = new CardPopupView(this.film);
+    const oldPopupComponent = this._component;
+    this._component = new CardPopupView(this.film);
     this._bodyElement.classList.add('hide-overflow');
     if (oldPopupComponent === null) {
-      renderElement(this._bodyElement,this.currentPopupComponent,RenderPosition.BEFOREEND);
+      renderElement(this._bodyElement,this._component,RenderPosition.BEFOREEND);
       this._setPopupHandlers();
       return;
     }
     if (this._bodyElement.contains(oldPopupComponent.getElement())) {
-      replace(this.currentPopupComponent, oldPopupComponent);
+      replace(this._component, oldPopupComponent);
       this._setPopupHandlers();
       remove(oldPopupComponent);
     }
   }
 
+  get component () {
+    return this._component;
+  }
+
   _setPopupHandlers() {
-    this.currentPopupComponent.setCloseButtonClickHandler(this.destroy);
+    this._component.setCloseButtonClickHandler(this.destroy);
     document.addEventListener('keydown',this._handlePopupEscPress);
-    this.currentPopupComponent.setWatchlistHandler(this._handlePopupWatchlistClick);
-    this.currentPopupComponent.setWatchedHandler(this._handlePopupWatchedClick);
-    this.currentPopupComponent.setFavoriteHandler(this._handlePopupFavoriteClick);
-    this.currentPopupComponent.setCommentSendHandler(this._handleNewCommentSend);
+    this._component.setWatchlistHandler(this._handlePopupWatchlistClick);
+    this._component.setWatchedHandler(this._handlePopupWatchedClick);
+    this._component.setFavoriteHandler(this._handlePopupFavoriteClick);
+    this._component.setCommentSendHandler(this._handleNewCommentSend);
   }
 
   destroy() {
-    remove(this.currentPopupComponent);
-    this.currentPopupComponent = null;
+    remove(this._component);
+    this._component = null;
     this._bodyElement.classList.remove('hide-overflow');
     document.removeEventListener('keydown',this._handlePopupEscPress);
   }
 
   updatePopup(film) {
-    this.currentPopupComponent.updateState(film);
+    this._component.updateState(film);
   }
 
-  getCurrentY() {
-    return this.currentPopupComponent.getElement().scrollTop;
+  get currentY() {
+    return this._component.getElement().scrollTop;
   }
 
-  setCurrentY(newY) {
-    this.currentPopupComponent.getElement().scrollTo(0,newY);
+  set currentY(newY) {
+    this._component.getElement().scrollTo(0,newY);
   }
 
   _handlePopupEscPress(evt) {
