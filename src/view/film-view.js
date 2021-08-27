@@ -1,8 +1,10 @@
+import { DateFormats } from '../const';
+import { formatDate, createDurationMinutes } from '../utils';
 import AbstractView from './abstract-view';
-import CardPopupView from './card-popup';
+import CardPopupView from './film-popup-view';
 
 const getCardTemplate = (film) => {
-  const {poster, title, description, rating, year, duration, genres, comments, isInWatchlist, isWatched, isFavorite} = film;
+  const {poster, title, description, rating, releaseDate, duration, genres, comments, isInWatchlist, isWatched, isFavorite} = film;
   let shortDescription = description.join('');
   shortDescription = shortDescription.length > 140 ? `${shortDescription.slice(0,139)}...` : shortDescription;
 
@@ -10,8 +12,8 @@ const getCardTemplate = (film) => {
     <h3 class="film-card__title">${title}</h3>
     <p class="film-card__rating">${rating}</p>
     <p class="film-card__info">
-      <span class="film-card__year">${year}</span>
-      <span class="film-card__duration">${duration}</span>
+      <span class="film-card__year">${formatDate(releaseDate,DateFormats.TO_YEAR)}</span>
+      <span class="film-card__duration">${formatDate(createDurationMinutes(duration),DateFormats.HOURS_AND_MINUTES)}</span>
       <span class="film-card__genre">${genres[0]}</span>
     </p>
     <img src="./images/posters/${poster}" alt="" class="film-card__poster">

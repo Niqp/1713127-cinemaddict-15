@@ -1,4 +1,4 @@
-import CardPopupView from '../view/card-popup';
+import CardPopupView from '../view/film-popup-view';
 import { remove, replace, renderElement } from '../render';
 import { RenderPosition } from '../const';
 
@@ -9,6 +9,7 @@ export default class PopupPresenter {
     this._handlePopupWatchlistClick = this._handlePopupWatchlistClick.bind(this);
     this._handlePopupWatchedClick = this._handlePopupWatchedClick.bind(this);
     this._handlePopupFavoriteClick = this._handlePopupFavoriteClick.bind(this);
+    this._handleNewCommentSend = this._handleNewCommentSend.bind(this);
     this._updateFilm = updateFilm;
     this.currentPopupComponent = null;
     this._bodyElement = document.querySelector('body');
@@ -33,11 +34,12 @@ export default class PopupPresenter {
   }
 
   _setPopupHandlers() {
-    this.currentPopupComponent.setClickHandler(this.destroy);
+    this.currentPopupComponent.setCloseButtonClickHandler(this.destroy);
     document.addEventListener('keydown',this._handlePopupEscPress);
     this.currentPopupComponent.setWatchlistHandler(this._handlePopupWatchlistClick);
     this.currentPopupComponent.setWatchedHandler(this._handlePopupWatchedClick);
     this.currentPopupComponent.setFavoriteHandler(this._handlePopupFavoriteClick);
+    this.currentPopupComponent.setCommentSendHandler(this._handleNewCommentSend);
   }
 
   destroy() {
@@ -47,45 +49,61 @@ export default class PopupPresenter {
     document.removeEventListener('keydown',this._handlePopupEscPress);
   }
 
+  updatePopup(film) {
+    this.currentPopupComponent.updateState(film);
+  }
+
+  getCurrentY() {
+    return this.currentPopupComponent.getElement().scrollTop;
+  }
+
+  setCurrentY(newY) {
+    this.currentPopupComponent.getElement().scrollTo(0,newY);
+  }
+
   _handlePopupEscPress(evt) {
     if (evt.key === 'Escape') {
       this.destroy();
     }
   }
 
-  _handlePopupWatchlistClick() {
+  _handlePopupWatchlistClick(film) {
     this._updateFilm(
       Object.assign(
         {},
-        this.film,
+        film,
         {
-          isInWatchlist: !this.film.isInWatchlist,
+          isInWatchlist: !film.isInWatchlist,
         },
       ),
     );
   }
 
-  _handlePopupWatchedClick() {
+  _handlePopupWatchedClick(film) {
     this._updateFilm(
       Object.assign(
         {},
-        this.film,
+        film,
         {
-          isWatched: !this.film.isWatched,
+          isWatched: !film.isWatched,
         },
       ),
     );
   }
 
-  _handlePopupFavoriteClick() {
+  _handlePopupFavoriteClick(film) {
     this._updateFilm(
       Object.assign(
         {},
-        this.film,
+        film,
         {
-          isFavorite: !this.film.isFavorite,
+          isFavorite: !film.isFavorite,
         },
       ),
     );
+  }
+
+  _handleNewCommentSend(film) {
+    this._updateFilm(film);
   }
 }

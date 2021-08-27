@@ -1,13 +1,10 @@
-import { getRandomInteger, getRandomFloat, getRandomArrayElement, getRandomArrayQuantity, getRandomArrayItems, createDateWithGap } from '../utils.js';
+import { getRandomInteger, getRandomFloat, getRandomArrayElement, getRandomArrayQuantity, getRandomArrayItems, createDateWithDayGap } from '../utils.js';
 import { mockFilms, mockText, mockGenres, mockPeople, emotes } from '../const.js';
 import { nanoid } from 'nanoid';
 
-
-const DAYS_GAP = 7;
-
 function Comment() {
   this.emote = getRandomArrayElement(emotes);
-  this.date = createDateWithGap(DAYS_GAP);
+  this.date = createDateWithDayGap(getRandomInteger(0,9000));
   this.author = getRandomArrayElement(mockPeople);
   this.message = getRandomArrayElement(mockText);
 }
@@ -17,7 +14,6 @@ export default class Film {
     const filmIndex = getRandomArrayQuantity(mockFilms)-1;
     const descriptionLength = getRandomInteger(1,5);
     const genresLength = getRandomInteger(1,3);
-    const releaseYear = getRandomInteger(1895,2021);
     this.id = nanoid();
     this.poster = mockFilms[filmIndex].poster;
     this.title = mockFilms[filmIndex].title;
@@ -26,10 +22,9 @@ export default class Film {
     this.director = getRandomArrayElement(mockPeople);
     this.writers = getRandomArrayItems(mockPeople,3);
     this.actors = getRandomArrayItems(mockPeople,3);
-    this.releaseDate = releaseYear;
+    this.releaseDate = createDateWithDayGap(getRandomInteger(0,9000));
     this.country = 'USA';
-    this.year = releaseYear;
-    this.duration = `${getRandomInteger(0,3)}h ${getRandomInteger(0,59)}m`;
+    this.duration = getRandomInteger(0,260);
     this.genres = getRandomArrayItems(mockGenres, genresLength);
     this.ageRestriction = '18+';
     this.description = getRandomArrayItems(mockText, descriptionLength);
