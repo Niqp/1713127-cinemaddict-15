@@ -1,5 +1,5 @@
 import { DateFormats } from '../const';
-import { formatDate, createDurationMinutes } from '../utils';
+import { formatDate, createDurationMinutes } from '../utils/utils';
 import AbstractView from './abstract-view';
 import CardPopupView from './film-popup-view';
 

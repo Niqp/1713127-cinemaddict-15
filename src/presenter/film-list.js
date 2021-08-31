@@ -6,11 +6,11 @@ import FilmPresenter from './film-presenter';
 import PopupPresenter from './film-popup-presenter';
 import { RenderPosition, CardNumber, NoFilmsMessages, SortType } from '../const';
 import { renderElement, remove } from '../render';
-import { updateItem } from '../utils';
 import { getNewestMovies, getTopRatedMovies } from '../filters';
 
 export default class FilmList {
-  constructor(listContainer) {
+  constructor(listContainer,filmsModel) {
+    this._filmsModel = filmsModel;
     this._listContainer = listContainer;
     this._filmContainerComponent = new FilmContainerView();
     this._filmEmptyContainerComponent = new FilmEmptyContainerView();
@@ -25,12 +25,14 @@ export default class FilmList {
     this._currentSortMethod = SortType.DEFAULT;
   }
 
-  init(films) {
-    this._films = films.slice();
-    this._currentFilmOrder = this._films;
+  init() {
     this._currentPopup = new PopupPresenter(this._handleFilmUpdate);
     this._renderSortMenu();
     this._renderFilmList();
+  }
+
+  _getFilms() {
+    return this._filmsModel.films;
   }
 
   _renderSortMenu() {
@@ -53,22 +55,23 @@ export default class FilmList {
     this._currentSortMethod = type;
     switch (type) {
       case SortType.DEFAULT:
-        this._currentFilmOrder = this._films;
+        this._currentFilmOrder = this._getFilms();
         this._sortFilms(this._currentFilmOrder);
         break;
       case SortType.RATING:
-        this._currentFilmOrder = getTopRatedMovies(this._films);
+        this._currentFilmOrder = getTopRatedMovies(this._getFilms());
         this._sortFilms(this._currentFilmOrder);
         break;
       case SortType.DATE:
-        this._currentFilmOrder = getNewestMovies(this._films);
+        this._currentFilmOrder = getNewestMovies(this._getFilms());
         this._sortFilms(this._currentFilmOrder);
         break;
     }
   }
 
   _renderFilmList() {
-    if (this._films.length < 1) {
+    this._currentFilmOrder = this._getFilms();
+    if (this._currentFilmOrder.length < 1) {
       this._renderFilmEmptyContainer();
       return;
     }
@@ -118,7 +121,7 @@ export default class FilmList {
   }
 
   _handleFilmUpdate(updatedFilm) {
-    this._films = updateItem(this._films,updatedFilm);
+    // this._currentFilmOrder = updateItem(this._currentFilmOrder,updatedFilm);
     this._filmPresenter.get(updatedFilm.id).init(updatedFilm);
     if (this._currentPopup.component && this._currentPopup.component.currentId === updatedFilm.id) {
       const savedY = this._currentPopup.currentY;
@@ -137,7 +140,7 @@ export default class FilmList {
 
   _handleShowMoreButtonClick() {
     this._renderFilms(this._currentFilmOrder);
-    if (this._generatedCardsCount >= this._films.length && this._showMoreButtonComponent) {
+    if (this._generatedCardsCount >= this._currentFilmOrder.length) {
       remove(this._showMoreButtonComponent);
     }
   }

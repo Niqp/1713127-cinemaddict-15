@@ -1,4 +1,4 @@
-import { createCurrentDate, generateElements, createDurationMinutes, formatDate, getTimeFromNow } from '../utils.js';
+import { createCurrentDate, generateElements, createDurationMinutes, formatDate, getTimeFromNow } from '../utils/utils.js';
 import { DateFormats, emotes } from '../const.js';
 import SmartView from './smart-view.js';
 const genreTemplate = (element) => (
