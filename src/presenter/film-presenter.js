@@ -1,5 +1,5 @@
 import CardView from '../view/film-view';
-import { RenderPosition } from '../const';
+import { RenderPosition, UpdateType, UserAction } from '../const';
 import { remove, replace, renderElement } from '../render';
 
 export default class FilmPresenter {
@@ -53,6 +53,8 @@ export default class FilmPresenter {
 
   _handleWatchlistClick() {
     this._updateFilm(
+      UserAction.TOGGLE_PARAMETERS,
+      UpdateType.MINOR,
       Object.assign(
         {},
         this.film,
@@ -65,6 +67,8 @@ export default class FilmPresenter {
 
   _handleWatchedClick() {
     this._updateFilm(
+      UserAction.TOGGLE_PARAMETERS,
+      UpdateType.MINOR,
       Object.assign(
         {},
         this.film,
@@ -77,6 +81,8 @@ export default class FilmPresenter {
 
   _handleFavoriteClick() {
     this._updateFilm(
+      UserAction.TOGGLE_PARAMETERS,
+      UpdateType.MINOR,
       Object.assign(
         {},
         this.film,

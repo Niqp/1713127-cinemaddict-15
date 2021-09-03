@@ -1,15 +1,17 @@
-import CardPopupView from '../view/film-popup-view';
+import FilmPopupView from '../view/film-popup-view';
 import { remove, replace, renderElement } from '../render';
-import { RenderPosition } from '../const';
+import { RenderPosition, UpdateType, UserAction } from '../const';
 
 export default class PopupPresenter {
-  constructor(updateFilm) {
+  constructor(updateFilm,commentsModel) {
+    this._commentsModel = commentsModel;
     this.destroy = this.destroy.bind(this);
     this._handlePopupEscPress = this._handlePopupEscPress.bind(this);
     this._handlePopupWatchlistClick = this._handlePopupWatchlistClick.bind(this);
     this._handlePopupWatchedClick = this._handlePopupWatchedClick.bind(this);
     this._handlePopupFavoriteClick = this._handlePopupFavoriteClick.bind(this);
     this._handleNewCommentSend = this._handleNewCommentSend.bind(this);
+    this._handleDeleteComment = this._handleDeleteComment.bind(this);
     this._updateFilm = updateFilm;
     this._component = null;
     this._bodyElement = document.querySelector('body');
@@ -18,8 +20,9 @@ export default class PopupPresenter {
 
   init(film) {
     this.film = film;
+    this._generateComments(this.film);
     const oldPopupComponent = this._component;
-    this._component = new CardPopupView(this.film);
+    this._component = new FilmPopupView(this.film, this._comments);
     this._bodyElement.classList.add('hide-overflow');
     if (oldPopupComponent === null) {
       renderElement(this._bodyElement,this._component,RenderPosition.BEFOREEND);
@@ -44,6 +47,7 @@ export default class PopupPresenter {
     this._component.setWatchedHandler(this._handlePopupWatchedClick);
     this._component.setFavoriteHandler(this._handlePopupFavoriteClick);
     this._component.setCommentSendHandler(this._handleNewCommentSend);
+    this._component.setCommentDeleteHandler(this._handleDeleteComment);
   }
 
   destroy() {
@@ -54,7 +58,11 @@ export default class PopupPresenter {
   }
 
   updatePopup(film) {
+    const currentY = this._component.getElement().scrollTop;
+    this._generateComments(film);
+    this._component.comments = this._comments;
     this._component.updateState(film);
+    this._component.getElement().scrollTo(0,currentY);
   }
 
   get currentY() {
@@ -65,6 +73,14 @@ export default class PopupPresenter {
     this._component.getElement().scrollTo(0,newY);
   }
 
+  _generateComments(film) {
+    this._comments = [];
+    film.comments.forEach((comment) => {
+      this._comments.push(this._commentsModel.comments.find((modelComment) => modelComment.id === comment));
+    });
+
+  }
+
   _handlePopupEscPress(evt) {
     if (evt.key === 'Escape') {
       this.destroy();
@@ -73,6 +89,8 @@ export default class PopupPresenter {
 
   _handlePopupWatchlistClick(film) {
     this._updateFilm(
+      UserAction.TOGGLE_PARAMETERS,
+      UpdateType.MINOR,
       Object.assign(
         {},
         film,
@@ -85,6 +103,8 @@ export default class PopupPresenter {
 
   _handlePopupWatchedClick(film) {
     this._updateFilm(
+      UserAction.TOGGLE_PARAMETERS,
+      UpdateType.MINOR,
       Object.assign(
         {},
         film,
@@ -97,6 +117,8 @@ export default class PopupPresenter {
 
   _handlePopupFavoriteClick(film) {
     this._updateFilm(
+      UserAction.TOGGLE_PARAMETERS,
+      UpdateType.MINOR,
       Object.assign(
         {},
         film,
@@ -107,7 +129,20 @@ export default class PopupPresenter {
     );
   }
 
-  _handleNewCommentSend(film) {
-    this._updateFilm(film);
+  _handleNewCommentSend(film,comment) {
+    this._updateFilm(
+      UserAction.ADD_COMMENT,
+      UpdateType.PATCH,
+      film,
+      comment);
+  }
+
+  _handleDeleteComment(film,id) {
+    this._updateFilm(
+      UserAction.REMOVE_COMMENT,
+      UpdateType.PATCH,
+      film,
+      id,
+    );
   }
 }

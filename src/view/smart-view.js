@@ -9,13 +9,9 @@ export default class Smart extends AbstractView {
   updateElement() {
     const prevElement = this.getElement();
     const parent = prevElement.parentElement;
-    const currentY = this.getElement().scrollTop;
     this.removeElement();
-
     const newElement = this.getElement();
-
     parent.replaceChild(newElement, prevElement);
-    this.getElement().scrollTo(0,currentY);
     this.restoreHandlers();
   }
 

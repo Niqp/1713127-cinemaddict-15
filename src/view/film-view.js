@@ -1,7 +1,6 @@
 import { DateFormats } from '../const';
 import { formatDate, createDurationMinutes } from '../utils/utils';
 import AbstractView from './abstract-view';
-import CardPopupView from './film-popup-view';
 
 const getCardTemplate = (film) => {
   const {poster, title, description, rating, releaseDate, duration, genres, comments, isInWatchlist, isWatched, isFavorite} = film;
@@ -36,7 +35,6 @@ export default class Card extends AbstractView {
       title: this.getElement().querySelector('.film-card__title'),
       comments: this.getElement().querySelector('.film-card__comments'),
     };
-    this._popup = new CardPopupView(this._film);
     this._clickHandler = this._clickHandler.bind(this);
     this._watchlistHandler = this._watchlistHandler.bind(this);
     this._watchedHandler = this._watchedHandler.bind(this);

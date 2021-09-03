@@ -1,33 +1,42 @@
-import MainMenuView from './view/menu';
 import ProfileView from './view/profile';
-// import TopRatedSectionView from './view/card-top-rated';
-// import MostCommentedSectionView from './view/card-most-commented';
+// import TopRatedSectionView from './view/film-top-rated';
+// import MostCommentedSectionView from './view/film-most-commented';
 import FilmsModel from './model/film-model';
 import FooterStatsView from './view/footer-stats';
 import Film from './mock/generate-film';
+import Comment from './mock/generate-comments';
 import { calculateRank } from './profile-rank';
-import { ranks, RenderPosition, CardNumber } from './const';
-import { getWatchlistMovies,getHistoryListMovies,getFavoriteMovies} from './filters';
+import { ranks, RenderPosition, CardNumber, FilterType } from './const';
 import { renderElement } from './render';
 import FilmList from './presenter/film-list';
+import CommentsModel from './model/comments-model';
+import FilterModel from './model/filter-model';
+import FilterMenuPresenter from './presenter/filter-menu-presenter';
+import { filter } from './filters';
 
 const mainElement = document.querySelector('.main');
 const headerElement = document.querySelector('.header');
 const footerElement = document.querySelector('.footer');
 
+
 const siteRender = () => {
   const filmsModel = new FilmsModel();
+  const commentsModel = new CommentsModel();
+  const filterModel = new FilterModel();
+
   const renderedCards = new Array(CardNumber.CARDS_TO_GENERATE)
     .fill()
-    .map((item) => new Film(item));
+    .map(() => new Film());
+  const generatedComments = [];
+  renderedCards.forEach((film) => {
+    film.comments.forEach((id) => generatedComments.push(new Comment(id)));
+  });
   // const currentTopRatedMovies = getTopRatedMovies(renderedCards);
   // const currentMostCommentedMovies = getMostCommentedMovies(renderedCards);
+  commentsModel.comments = generatedComments;
   filmsModel.films = renderedCards;
-  const currentWatchlistMovies = getWatchlistMovies(renderedCards);
-  const currentHistoryListMovies = getHistoryListMovies(renderedCards);
-  const currentFavoriteMovies = getFavoriteMovies(renderedCards);
-
-  if (currentHistoryListMovies.length >= 1) {
+  const currentHistoryListMovies = filter[FilterType.HISTORY](filmsModel.films).length;
+  if (currentHistoryListMovies >= 1) {
     renderElement(
       headerElement,
       new ProfileView(calculateRank(ranks, currentHistoryListMovies)),RenderPosition.BEFOREEND);
@@ -36,27 +45,7 @@ const siteRender = () => {
     footerElement,
     new FooterStatsView(renderedCards),
     RenderPosition.BEFOREEND);
-  renderElement(
-    mainElement,
-    new MainMenuView(
-      currentWatchlistMovies,
-      currentHistoryListMovies,
-      currentFavoriteMovies),
-    RenderPosition.BEFOREEND);
-  // renderElement(
-  //   mainElement,
-  //   new SortMenuView(),
-  //   RenderPosition.BEFOREEND);
 
-  // const renderFilmList = () => {
-  //   // const filmList = new FilmContainerView(renderedCards,true);
-  //   // renderElement(
-  //   //   mainElement,
-  //   //   filmList,
-  //   //   renderPosition.BEFOREEND);
-  //   // filmList.renderCards();
-  //   // filmList.renderShowMoreButton();
-  //   const films = mainElement.querySelector('.films');
   //   const renderExtraSection = (template, cards) => {
   //     const currentSection = new template(cards,false);
   //     renderElement(
@@ -70,16 +59,10 @@ const siteRender = () => {
   //   renderExtraSection(TopRatedSectionView, currentMostCommentedMovies);
   // };
 
-  const filmListPresenter = new FilmList(mainElement,filmsModel);
+  const filterMenu = new FilterMenuPresenter(mainElement,filterModel,filmsModel);
+  const filmListPresenter = new FilmList(mainElement,filmsModel,commentsModel,filterModel);
+  filterMenu.init();
   filmListPresenter.init();
 
-//   if (renderedCards.length >= 1) {
-//    renderFilmList();
-//   } else {
-//     renderElement(
-//       mainElement,
-//       new FilmEmptyContainerView(NO_FILMS_MESSAGES.noMovies),
-//       renderPosition.BEFOREEND);
-//   }
 };
 siteRender();
