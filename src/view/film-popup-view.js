@@ -14,7 +14,7 @@ const commentTemplate = (element) => (
     <img src="./images/emoji/${element.emote}.png" width="55" height="55" alt="emoji-${element.emote}">
   </span>
   <div>
-    <p class="film-details__comment-text">${element.message}</p>
+    <p class="film-details__comment-text">${he.encode(element.message)}</p>
     <p class="film-details__comment-info">
       <span class="film-details__comment-author">${element.author}</span>
       <span class="film-details__comment-day">${getTimeFromNow(element.date)}</span>

@@ -34,6 +34,8 @@ export default class FilmList {
 
   init() {
     this._currentFilmOrder = this._getFilms();
+    this._renderSortMenu();
+    this._renderFilmContainer();
     this._renderFilmList(this._currentFilmOrder);
   }
 
@@ -85,6 +87,8 @@ export default class FilmList {
         this._currentFilmOrder = this._getFilms();
         this._popupModelUpdate(data);
         this._clearFilmList();
+        this._renderSortMenu();
+        this._renderFilmContainer();
         this._renderFilmList(this._currentFilmOrder);
         break;}
     }  }
@@ -113,15 +117,7 @@ export default class FilmList {
     this._clearFilms();
     const currentlyRenderedCount = this._generatedCardsCount;
     this._generatedCardsCount = 0;
-    if (films.length > currentlyRenderedCount) {
-      this._renderShowMoreButton();
-    }
-    if (films.length < 1) {
-      const selectedFilter = this._filterModel.getFilter();
-      this._renderFilmEmptyContainer(NoFilmsMessages[selectedFilter]);
-      return;
-    }
-    this._renderFilms(films,currentlyRenderedCount);
+    this._renderFilmList(films,currentlyRenderedCount);
   }
 
   _clearFilmList() {
@@ -159,8 +155,6 @@ export default class FilmList {
   }
 
   _renderFilmList(films,currentlyRenderedCount = CardNumber.CARDS_TO_RENDER) {
-    this._renderSortMenu();
-    this._renderFilmContainer();
     if (films.length < 1) {
       const selectedFilter = this._filterModel.getFilter();
       this._renderFilmEmptyContainer(NoFilmsMessages[selectedFilter]);
