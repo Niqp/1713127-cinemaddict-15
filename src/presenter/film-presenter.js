@@ -1,6 +1,7 @@
 import CardView from '../view/film-view';
 import { RenderPosition, UpdateType, UserAction } from '../const';
 import { remove, replace, renderElement } from '../render';
+import { createCurrentDate } from '../utils/utils';
 
 export default class FilmPresenter {
   constructor(filmContainer, addPopup, updateFilm) {
@@ -74,6 +75,7 @@ export default class FilmPresenter {
         this.film,
         {
           isWatched: !this.film.isWatched,
+          watchedDate: createCurrentDate(),
         },
       ),
     );

@@ -25,18 +25,27 @@ export default class FilmList {
     this._handleFilmSorting = this._handleFilmSorting.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
-    this._filmsModel.addObserver(this._handleModelEvent);
-    this._filterModel.addObserver(this._handleModelEvent);
     this._mainElement = document.querySelector('.main');
     this._generatedCardsCount = 0;
-    this._currentSortMethod = SortType.DEFAULT;
   }
 
   init() {
     this._currentFilmOrder = this._getFilms();
+    this._filmsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
+    this._currentSortMethod = SortType.DEFAULT;
     this._renderSortMenu();
     this._renderFilmContainer();
     this._renderFilmList(this._currentFilmOrder);
+  }
+
+  destroy() {
+    this._clearFilms();
+    this._generatedCardsCount = 0;
+    remove(this._sortMenu);
+    remove(this._filmContainerComponent);
+    this._filmsModel.removeObserver(this._handleModelEvent);
+    this._filterModel.removeObserver(this._handleModelEvent);
   }
 
   _getFilms() {

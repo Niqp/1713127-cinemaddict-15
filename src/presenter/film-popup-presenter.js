@@ -1,6 +1,7 @@
 import FilmPopupView from '../view/film-popup-view';
 import { remove, replace, renderElement } from '../render';
 import { RenderPosition, UpdateType, UserAction } from '../const';
+import { createCurrentDate } from '../utils/utils';
 
 export default class PopupPresenter {
   constructor(updateFilm,commentsModel) {
@@ -110,6 +111,7 @@ export default class PopupPresenter {
         film,
         {
           isWatched: !film.isWatched,
+          watchedDate: createCurrentDate(),
         },
       ),
     );

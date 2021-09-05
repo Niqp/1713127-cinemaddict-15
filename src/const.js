@@ -8,6 +8,12 @@ export const FilterType = {
   WATCHLIST: 'watchlist',
   HISTORY: 'history',
   FAVORITES: 'favorites',
+  NONE: 'none',
+};
+
+export const StateType = {
+  FILMS: 'films',
+  STATS: 'stats',
 };
 
 export const NoFilmsMessages = {
@@ -106,23 +112,28 @@ export const emotes = [
   'smile',
 ];
 
-export const ranks = [
-  {
+export const Ranks = {
+  NONE: {
+    name:'None',
+    low:-Infinity,
+    high:0,
+  },
+  NOVICE: {
     name:'Novice',
     low:1,
     high:10,
   },
-  {
+  FAN: {
     name:'Fan',
     low:11,
     high:20,
   },
-  {
+  MOVIEBUFF: {
     name:'Movie Buff',
     low:21,
     high:Infinity,
   },
-];
+};
 
 export const CardNumber = {
   CARDS_TO_GENERATE: 14,
