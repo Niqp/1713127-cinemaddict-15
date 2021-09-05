@@ -60,12 +60,8 @@ export default class StatsPresenter {
       return sum;
     },{});
 
-    this._sortedGenres = new Array(Object.keys(genres).length).fill()
-      .map((genre,index) => {
-        const name = Object.keys(genres)[index];
-        const value = Object.values(genres)[index];
-        return {name,value};
-      })
+    this._sortedGenres = Object.entries(genres)
+      .map(([name,value]) => ({name,value}))
       .sort((a,b) => b.value - a.value);
     const topGenre = this._sortedGenres[0].name;
     return {
