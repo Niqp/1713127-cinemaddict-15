@@ -1,8 +1,10 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
+dayjs.extend(isSameOrAfter);
 // const ALERT_SHOW_TIME = 5000;
 // const ALERT_ANIMATION_DELAY = 500;
 const DEBOUNCE_DELAY = 500;
@@ -111,6 +113,11 @@ export const formatDate = (date,format) => date.format(format);
 export const createDurationMinutes = (time) => dayjs.duration(time,'minutes');
 
 export const getTimeFromNow = (date) => date.fromNow();
+
+export const IsTimeAfterDate = (date,afterType) => {
+  const subtracted = createCurrentDate().subtract(1,afterType);
+  return date.isSameOrAfter(subtracted);
+};
 
 export const generateElements = (elements,template) => {
   const generatedElements = new Array;

@@ -1,7 +1,8 @@
+import { StatFilterType } from '../const';
 import { createDurationMinutes } from '../utils/utils';
-import SmartView from './smart-view';
+import AbstractView from './abstract-view';
 
-const getStatsTemplate = (stats,rank) => {
+const getStatsTemplate = (stats,rank,activeButton) => {
   const {watched,duration,topGenre} = stats;
 
   return `<section class="statistic">
@@ -14,19 +15,19 @@ const getStatsTemplate = (stats,rank) => {
   <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
     <p class="statistic__filters-description">Show stats:</p>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="all-time" checked>
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="all-time" ${activeButton === StatFilterType.ALL_TIME ? 'checked' : ''}>
     <label for="statistic-all-time" class="statistic__filters-label">All time</label>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="today">
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="today" ${activeButton === StatFilterType.TODAY ? 'checked' : ''}>
     <label for="statistic-today" class="statistic__filters-label">Today</label>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-week" value="week">
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-week" value="week" ${activeButton === StatFilterType.WEEK ? 'checked' : ''}>
     <label for="statistic-week" class="statistic__filters-label">Week</label>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-month" value="month">
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-month" value="month" ${activeButton === StatFilterType.MONTH ? 'checked' : ''}>
     <label for="statistic-month" class="statistic__filters-label">Month</label>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-year" value="year">
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-year" value="year" ${activeButton === StatFilterType.YEAR ? 'checked' : ''}>
     <label for="statistic-year" class="statistic__filters-label">Year</label>
   </form>
 
@@ -53,17 +54,31 @@ const getStatsTemplate = (stats,rank) => {
 `;
 };
 
-export default class StatsView extends SmartView {
-  constructor(mainContainer,films,rank) {
+export default class StatsView extends AbstractView {
+  constructor(mainContainer,films,rank,activeButton) {
     super();
     this._films = films;
     this._rank = rank;
+    this._activeButton = activeButton;
     this._mainContainer = mainContainer;
+    this._statFilterClickHandler = this._statFilterClickHandler.bind(this);
+    this._statButtons = this.getElement().querySelectorAll('.statistic__filters-input');
+    this._currentActiveButton = this.getElement().querySelector('.statistic__filters-input:checked');
   }
 
   getTemplate() {
-    return getStatsTemplate(this._films,this._rank);
+    return getStatsTemplate(this._films,this._rank,this._activeButton);
   }
 
-  restoreHandlers() {}
+  _statFilterClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.filterClick(evt.target.value);
+  }
+
+  setFilterClickHandler(callback) {
+    this._callback.filterClick = callback;
+    for (const button of this._statButtons) {
+      button.addEventListener('click', this._statFilterClickHandler);
+    }
+  }
 }

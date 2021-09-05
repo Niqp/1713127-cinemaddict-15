@@ -24,8 +24,8 @@ export default class Film {
     this.ageRestriction = '18+';
     this.description = getRandomArrayItems(mockText, descriptionLength);
     this.isInWatchlist = Boolean(getRandomInteger(0, 1));
-    this.isWatched = false;
-    this.watchedDate = null;
+    this.isWatched = Boolean(getRandomInteger(0, 1));
+    this.watchedDate = createDateWithDayGap(getRandomInteger(0,400));
     this.isFavorite = Boolean(getRandomInteger(0, 1));
   }
 }

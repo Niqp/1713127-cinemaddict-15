@@ -16,6 +16,14 @@ export const StateType = {
   STATS: 'stats',
 };
 
+export const StatFilterType = {
+  ALL_TIME: 'all-time',
+  TODAY: 'today',
+  WEEK: 'week',
+  MONTH: 'month',
+  YEAR: 'year',
+};
+
 export const NoFilmsMessages = {
   [FilterType.ALL]: 'There are no movies in our database.',
   [FilterType.WATCHLIST]: 'There are no movies to watch now.',
