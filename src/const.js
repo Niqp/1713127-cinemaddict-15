@@ -3,12 +3,34 @@ export const RenderPosition = {
   BEFOREEND: 'beforeend',
 };
 
-export const NoFilmsMessages = {
-  NO_MOVIES: 'There are no movies in our database.',
-  NO_WATCHLIST: 'There are no movies to watch now.',
-  NO_HISTORY: 'There are no watched movies now.',
-  NO_FAVORITES: 'There are no favorite movies now.',
+export const FilterType = {
+  ALL: 'all',
+  WATCHLIST: 'watchlist',
+  HISTORY: 'history',
+  FAVORITES: 'favorites',
+  NONE: 'none',
 };
+
+export const StateType = {
+  FILMS: 'films',
+  STATS: 'stats',
+};
+
+export const StatFilterType = {
+  ALL_TIME: 'all-time',
+  TODAY: 'today',
+  WEEK: 'week',
+  MONTH: 'month',
+  YEAR: 'year',
+};
+
+export const NoFilmsMessages = {
+  [FilterType.ALL]: 'There are no movies in our database.',
+  [FilterType.WATCHLIST]: 'There are no movies to watch now.',
+  [FilterType.HISTORY]: 'There are no watched movies now.',
+  [FilterType.FAVORITES]: 'There are no favorite movies now.',
+};
+
 
 export const DateFormats = {
   DEFAULT: 'YYYY/MMMM/DD HH:MM',
@@ -17,14 +39,16 @@ export const DateFormats = {
   HOURS_AND_MINUTES: 'H[h] mm[m]',
 };
 
-export const CommentDateText = {
-  NOW: 'Just now',
-  SECONDS: 'seconds ago',
-  MINUTES: 'minutes ago',
-  HOURS: 'hours ago',
-  DAYS: 'days ago',
-  MONTH: 'months ago',
-  YEAR: 'years ago',
+export const UserAction = {
+  ADD_COMMENT: 'ADD_COMMENT',
+  REMOVE_COMMENT: 'REMOVE_COMMENT',
+  TOGGLE_PARAMETERS: 'TOGGLE_PARAMETERS',
+};
+
+export const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
 };
 
 export const mockFilms = [
@@ -96,23 +120,28 @@ export const emotes = [
   'smile',
 ];
 
-export const ranks = [
-  {
+export const Ranks = {
+  NONE: {
+    name:'None',
+    low:-Infinity,
+    high:0,
+  },
+  NOVICE: {
     name:'Novice',
     low:1,
     high:10,
   },
-  {
+  FAN: {
     name:'Fan',
     low:11,
     high:20,
   },
-  {
+  MOVIEBUFF: {
     name:'Movie Buff',
     low:21,
     high:Infinity,
   },
-];
+};
 
 export const CardNumber = {
   CARDS_TO_GENERATE: 14,
@@ -125,3 +154,4 @@ export const SortType = {
   DATE: 'DATE',
   RATING: 'RATING',
 };
+

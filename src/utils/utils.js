@@ -1,8 +1,10 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
+dayjs.extend(isSameOrAfter);
 // const ALERT_SHOW_TIME = 5000;
 // const ALERT_ANIMATION_DELAY = 500;
 const DEBOUNCE_DELAY = 500;
@@ -112,6 +114,11 @@ export const createDurationMinutes = (time) => dayjs.duration(time,'minutes');
 
 export const getTimeFromNow = (date) => date.fromNow();
 
+export const IsTimeAfterDate = (date,afterType) => {
+  const subtracted = createCurrentDate().subtract(1,afterType);
+  return date.isSameOrAfter(subtracted);
+};
+
 export const generateElements = (elements,template) => {
   const generatedElements = new Array;
   elements.forEach((element) => {
@@ -120,16 +127,16 @@ export const generateElements = (elements,template) => {
   return generatedElements;
 };
 
-export const updateItem = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
+// export const updateItem = (items, update) => {
+//   const index = items.findIndex((item) => item.id === update.id);
 
-  if (index === -1) {
-    return items;
-  }
+//   if (index === -1) {
+//     return items;
+//   }
 
-  return [
-    ...items.slice(0, index),
-    update,
-    ...items.slice(index + 1),
-  ];
-};
+//   return [
+//     ...items.slice(0, index),
+//     update,
+//     ...items.slice(index + 1),
+//   ];
+// };

@@ -1,6 +1,9 @@
-import { createCurrentDate, generateElements, createDurationMinutes, formatDate, getTimeFromNow } from '../utils.js';
+import { createCurrentDate, generateElements, createDurationMinutes, formatDate, getTimeFromNow } from '../utils/utils.js';
 import { DateFormats, emotes } from '../const.js';
 import SmartView from './smart-view.js';
+import { nanoid } from 'nanoid';
+import he from 'he';
+
 const genreTemplate = (element) => (
   `<span class="film-details__genre">${element}</span>`
 );
@@ -11,11 +14,11 @@ const commentTemplate = (element) => (
     <img src="./images/emoji/${element.emote}.png" width="55" height="55" alt="emoji-${element.emote}">
   </span>
   <div>
-    <p class="film-details__comment-text">${element.message}</p>
+    <p class="film-details__comment-text">${he.encode(element.message)}</p>
     <p class="film-details__comment-info">
       <span class="film-details__comment-author">${element.author}</span>
       <span class="film-details__comment-day">${getTimeFromNow(element.date)}</span>
-      <button class="film-details__comment-delete">Delete</button>
+      <button type="button" class="film-details__comment-delete" data-comment-id="${element.id}">Delete</button>
     </p>
   </div>
 </li>`
@@ -28,8 +31,8 @@ const availableEmotesTemplate = (element) => (
   </label>`
 );
 
-const getCardPopupTemplate = (state) => {
-  const {poster,title,originalTitle,rating,director,writers,actors,releaseDate,country,duration,genres,ageRestriction,description,comments,isInWatchlist,isWatched,isFavorite,newCommentEmote,newCommentMessage} = state;
+const getFilmPopupTemplate = (state,comments) => {
+  const {poster,title,originalTitle,rating,director,writers,actors,releaseDate,country,duration,genres,ageRestriction,description,isInWatchlist,isWatched,isFavorite,newCommentEmote,newCommentMessage} = state;
   const generatedGenres = generateElements(genres,genreTemplate);
   const generatedComments = generateElements(comments,commentTemplate);
   const generatedEmotes = generateElements(emotes,availableEmotesTemplate);
@@ -115,7 +118,7 @@ const getCardPopupTemplate = (state) => {
           <div class="film-details__new-comment">
             <div class="film-details__add-emoji-label">${newCommentEmote ? `<img src="images/emoji/${newCommentEmote}.png" width="55" height="55" alt="emoji-smile">` : ''}</div>
               <label class="film-details__comment-label">
-                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${newCommentMessage ? newCommentMessage : ''}</textarea>
+                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${newCommentMessage ? he.encode(newCommentMessage) : ''}</textarea>
               </label>
               <div class="film-details__emoji-list">
               ${generatedEmotes.join('')}
@@ -128,12 +131,13 @@ const getCardPopupTemplate = (state) => {
 `;
 };
 
-export default class CardPopup extends SmartView {
-  constructor(film) {
+export default class FilmPopup extends SmartView {
+  constructor(film,comments) {
     super();
     this._currentId = film.id;
     this._checkedEmote = null;
-    this._state = CardPopup.parseFilmToState(film);
+    this._state = FilmPopup.parseFilmToState(film);
+    this._comments = comments;
     this._closeButtonClickHandler = this._closeButtonClickHandler.bind(this);
     this._watchlistHandler = this._watchlistHandler.bind(this);
     this._watchedHandler = this._watchedHandler.bind(this);
@@ -141,13 +145,22 @@ export default class CardPopup extends SmartView {
     this._newCommentEmoteChangeHandler = this._newCommentEmoteChangeHandler.bind(this);
     this._newCommentTextAreaHandler = this._newCommentTextAreaHandler.bind(this);
     this._newCommentSendHandler = this._newCommentSendHandler.bind(this);
+    this._deleteCommentHandler = this._deleteCommentHandler.bind(this);
     this._getHandledElements();
     this._setInnerHandlers();
 
   }
 
+  get comments() {
+    return this._comments;
+  }
+
+  set comments(comments) {
+    this._comments = comments;
+  }
+
   getTemplate() {
-    return getCardPopupTemplate(this._state);
+    return getFilmPopupTemplate(this._state,this._comments);
   }
 
   restoreHandlers() {
@@ -167,6 +180,7 @@ export default class CardPopup extends SmartView {
       watchlist: this.getElement().querySelector('.film-details__control-button--watchlist'),
       watched: this.getElement().querySelector('.film-details__control-button--watched'),
       favorite: this.getElement().querySelector('.film-details__control-button--favorite'),
+      deleteComment: this.getElement().querySelectorAll('.film-details__comment-delete'),
     };
     this._emotes = this.getElement().querySelectorAll('.film-details__emoji-item');
     this._textArea = this.getElement().querySelector('.film-details__comment-input');
@@ -189,6 +203,24 @@ export default class CardPopup extends SmartView {
     this.setWatchedHandler(this._callback.watchedChange);
     this.setFavoriteHandler(this._callback.favoriteChange);
     this.setCommentSendHandler(this._callback.newCommentSend);
+    this.setCommentDeleteHandler(this._callback.deleteComment);
+  }
+
+  _deleteCommentHandler(evt) {
+    evt.preventDefault();
+    const index = this._state.comments.findIndex((comment) => comment === evt.target.dataset.commentId);
+
+    if (index === -1) {
+      throw new Error('Can\'t delete unexisting comment');
+    }
+
+    this._state.comments = [
+      ...this._state.comments.slice(0, index),
+      ...this._state.comments.slice(index + 1),
+    ];
+
+
+    this._callback.deleteComment(FilmPopup.parseStateToFilm(this._state),evt.target.dataset.commentId);
   }
 
   _closeButtonClickHandler(evt) {
@@ -198,29 +230,31 @@ export default class CardPopup extends SmartView {
 
   _watchlistHandler(evt) {
     evt.preventDefault();
-    this._callback.watchlistChange(CardPopup.parseStateToFilm(this._state));
+    this._callback.watchlistChange(FilmPopup.parseStateToFilm(this._state));
   }
 
   _watchedHandler(evt) {
     evt.preventDefault();
-    this._callback.watchedChange(CardPopup.parseStateToFilm(this._state));
+    this._callback.watchedChange(FilmPopup.parseStateToFilm(this._state));
   }
 
   _favoriteHandler(evt) {
     evt.preventDefault();
-    this._callback.favoriteChange(CardPopup.parseStateToFilm(this._state));
+    this._callback.favoriteChange(FilmPopup.parseStateToFilm(this._state));
   }
 
   _newCommentEmoteChangeHandler(evt) {
     evt.preventDefault();
     if (evt.target.value !== this._state.newCommentEmote) {
       this._checkedEmote = evt.target.value;
+      const currentY = this.getElement().scrollTop;
       this.updateState(
         {
           isNewCommentEmote: true,
           newCommentEmote: this._checkedEmote,
         },
       );
+      this.getElement().scrollTo(0,currentY);
     }
   }
 
@@ -238,23 +272,31 @@ export default class CardPopup extends SmartView {
       evt.preventDefault();
       if (this._state.newCommentEmote && this._state.newCommentMessage) {
         this._newComment = {
+          id: nanoid(),
           emote: this._state.newCommentEmote,
           date: createCurrentDate(),
           author: 'Неопознанный Енот',
           message: this._state.newCommentMessage,
         };
-        this._state.comments.push(this._newComment);
+        this._state.comments.push(this._newComment.id);
         this._state.newCommentMessage = null;
         this._state.newCommentEmote = null;
-        this._callback.newCommentSend(CardPopup.parseStateToFilm(this._state));
+        this._checkedEmote = null;
+        this._callback.newCommentSend(FilmPopup.parseStateToFilm(this._state),this._newComment);
       }
+    }
+  }
+
+  setCommentDeleteHandler(callback) {
+    this._callback.deleteComment = callback;
+    for (const button of this._buttons.deleteComment) {
+      button.addEventListener('click',this._deleteCommentHandler);
     }
   }
 
   setCommentSendHandler(callback) {
     this._callback.newCommentSend = callback;
     this._textArea.addEventListener('keydown',this._newCommentSendHandler);
-
   }
 
   setCloseButtonClickHandler(callback) {

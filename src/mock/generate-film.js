@@ -1,13 +1,7 @@
-import { getRandomInteger, getRandomFloat, getRandomArrayElement, getRandomArrayQuantity, getRandomArrayItems, createDateWithDayGap } from '../utils.js';
-import { mockFilms, mockText, mockGenres, mockPeople, emotes } from '../const.js';
+import { getRandomInteger, getRandomFloat, getRandomArrayElement, getRandomArrayQuantity, getRandomArrayItems, createDateWithDayGap } from '../utils/utils.js';
+import { mockFilms, mockText, mockGenres, mockPeople } from '../const.js';
 import { nanoid } from 'nanoid';
 
-function Comment() {
-  this.emote = getRandomArrayElement(emotes);
-  this.date = createDateWithDayGap(getRandomInteger(0,9000));
-  this.author = getRandomArrayElement(mockPeople);
-  this.message = getRandomArrayElement(mockText);
-}
 
 export default class Film {
   constructor () {
@@ -15,6 +9,7 @@ export default class Film {
     const descriptionLength = getRandomInteger(1,5);
     const genresLength = getRandomInteger(1,3);
     this.id = nanoid();
+    this.comments = new Array(getRandomInteger(0,5)).fill().map(() => nanoid());
     this.poster = mockFilms[filmIndex].poster;
     this.title = mockFilms[filmIndex].title;
     this.originalTitle = mockFilms[filmIndex].title;
@@ -28,9 +23,9 @@ export default class Film {
     this.genres = getRandomArrayItems(mockGenres, genresLength);
     this.ageRestriction = '18+';
     this.description = getRandomArrayItems(mockText, descriptionLength);
-    this.comments = new Array(getRandomInteger(0,5)).fill().map((item) => new Comment(item));
     this.isInWatchlist = Boolean(getRandomInteger(0, 1));
     this.isWatched = Boolean(getRandomInteger(0, 1));
+    this.watchedDate = createDateWithDayGap(getRandomInteger(0,400));
     this.isFavorite = Boolean(getRandomInteger(0, 1));
   }
 }
