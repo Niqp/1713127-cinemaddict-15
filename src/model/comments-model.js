@@ -1,3 +1,4 @@
+import { UpdateType } from '../const';
 import AbstractObserver from '../utils/abstract-observer';
 
 export default class Comments extends AbstractObserver {
@@ -8,6 +9,7 @@ export default class Comments extends AbstractObserver {
 
   set comments(comments) {
     this._comments = comments.slice();
+    this._notify(UpdateType.PATCH, this._comments);
   }
 
   get comments() {

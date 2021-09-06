@@ -114,7 +114,7 @@ export const createDurationMinutes = (time) => dayjs.duration(time,'minutes');
 
 export const getTimeFromNow = (date) => date.fromNow();
 
-export const IsTimeAfterDate = (date,afterType) => {
+export const isTimeAfterDate = (date,afterType) => {
   const subtracted = createCurrentDate().subtract(1,afterType);
   return date.isSameOrAfter(subtracted);
 };
