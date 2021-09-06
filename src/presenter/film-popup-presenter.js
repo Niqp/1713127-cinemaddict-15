@@ -21,7 +21,8 @@ export default class PopupPresenter {
 
   init(film) {
     this.film = film;
-    this._generateComments(this.film);
+    // this._generateComments(this.film);
+    this._comments = this._commentsModel.findComments(this.film.comments);
     const oldPopupComponent = this._component;
     this._component = new FilmPopupView(this.film, this._comments);
     this._bodyElement.classList.add('hide-overflow');
@@ -60,7 +61,8 @@ export default class PopupPresenter {
 
   updatePopup(film) {
     const currentY = this._component.getElement().scrollTop;
-    this._generateComments(film);
+    // this._generateComments(film);
+    this._comments = this._commentsModel.findComments(film.comments);
     this._component.comments = this._comments;
     this._component.updateState(film);
     this._component.getElement().scrollTo(0,currentY);

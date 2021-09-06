@@ -16,6 +16,14 @@ export default class Comments extends AbstractObserver {
     return this._comments;
   }
 
+  findComments(sentComments) {
+    const foundComments = [];
+    for (const currentComment of sentComments) {
+      foundComments.push(this.comments.find((modelComment) => modelComment.id === currentComment));
+    }
+    return foundComments;
+  }
+
   addComment(updateType, update) {
     this._comments = [
       update,
