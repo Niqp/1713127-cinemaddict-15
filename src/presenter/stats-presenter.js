@@ -2,9 +2,8 @@ import { FilterType, RenderPosition, StatFilterType } from '../const';
 import { filter } from '../filters';
 import { remove, renderElement, replace } from '../render';
 import StatsView from '../view/stats-view';
-import Chart from 'chart.js';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { IsTimeAfterDate } from '../utils/utils';
+import { isTimeAfterDate } from '../utils/utils';
+import StatsChartView from '../view/stats-chart-view';
 
 export default class StatsPresenter {
   constructor(statsContainer,filmsModel,rankModel) {
@@ -28,20 +27,24 @@ export default class StatsPresenter {
       this._currentActiveButton = StatFilterType.ALL_TIME;
     }
     this._statsComponent = new StatsView(this._statsContainer,this._filmStats,this._rankModel.getRank().name,this._currentActiveButton);
+    this._statChartContainer = this._statsComponent.getElement().querySelector('.statistic__chart');
     this._statsComponent.setFilterClickHandler(this._handleFilterChange);
     if (oldStatsComponent === null) {
       renderElement(this._statsContainer,this._statsComponent,RenderPosition.BEFOREEND);
-      this._getStatChart();
+      this._statChart = new StatsChartView(this._statChartContainer,this._sortedGenres);
+      this._statChart.getStatChart();
       return;
     }
     replace(this._statsComponent, oldStatsComponent);
-    this._getStatChart();
+    this._statChart = new StatsChartView(this._statChartContainer,this._sortedGenres);
+    this._statChart.getStatChart();
     remove(oldStatsComponent);
   }
 
   destroy() {
     remove(this._statsComponent);
     this._statsComponent = null;
+    this._statChart = null;
     this._filmsModel.removeObserver(this._handleModelEvent);
     this._rankModel.removeObserver(this._handleModelEvent);
   }
@@ -78,11 +81,10 @@ export default class StatsPresenter {
         this.init();
         break;
     }
-
   }
 
   _filterFilmsByWatchedDate(films,dateCount,dateType) {
-    return films.slice().filter((film) => IsTimeAfterDate(film.watchedDate,dateCount,dateType));
+    return films.slice().filter((film) => isTimeAfterDate(film.watchedDate,dateCount,dateType));
   }
 
   _getFilmStats(films) {
@@ -113,75 +115,4 @@ export default class StatsPresenter {
       topGenre: topGenre,
     };
   }
-
-  _getStatChart () {
-    if (!this._sortedGenres || this._sortedGenres.length<1) {
-      return;
-    }
-    const BAR_HEIGHT = 50;
-    const statisticCtx = document.querySelector('.statistic__chart');
-    const labels = this._sortedGenres.map((genre) => genre.name);
-    const data = this._sortedGenres.map((genre) => genre.value);
-
-    statisticCtx.height = BAR_HEIGHT * labels.length;
-
-    this._chart = new Chart(statisticCtx, {
-      plugins: [ChartDataLabels],
-      type: 'horizontalBar',
-      data: {
-        labels: [...labels],
-        datasets: [{
-          data: [...data],
-          backgroundColor: '#ffe800',
-          hoverBackgroundColor: '#ffe800',
-          anchor: 'start',
-          barThickness: 24,
-        }],
-      },
-      options: {
-        plugins: {
-          datalabels: {
-            font: {
-              size: 20,
-            },
-            color: '#ffffff',
-            anchor: 'start',
-            align: 'start',
-            offset: 40,
-          },
-        },
-        scales: {
-          yAxes: [{
-            ticks: {
-              fontColor: '#ffffff',
-              padding: 100,
-              fontSize: 20,
-            },
-            gridLines: {
-              display: false,
-              drawBorder: false,
-            },
-          }],
-          xAxes: [{
-            ticks: {
-              display: false,
-              beginAtZero: true,
-            },
-            gridLines: {
-              display: false,
-              drawBorder: false,
-            },
-          }],
-        },
-        legend: {
-          display: false,
-        },
-        tooltips: {
-          enabled: false,
-        },
-      },
-    });
-  }
-
-
 }

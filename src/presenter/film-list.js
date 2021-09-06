@@ -30,13 +30,13 @@ export default class FilmList {
   }
 
   init() {
-    this._currentFilmOrder = this._getFilms();
+    this._currentFilms = this._getFilms();
     this._filmsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
     this._currentSortMethod = SortType.DEFAULT;
     this._renderSortMenu();
     this._renderFilmContainer();
-    this._renderFilmList(this._currentFilmOrder);
+    this._renderFilmList(this._currentFilms);
   }
 
   destroy() {
@@ -88,17 +88,17 @@ export default class FilmList {
         this._popupModelUpdate(data);
         break;
       case UpdateType.MINOR:{
-        this._currentFilmOrder = this._getFilms();
+        this._currentFilms = this._getFilms();
         this._popupModelUpdate(data);
         this._sortFilms(this._currentSortMethod);
         break;}
       case UpdateType.MAJOR:{
-        this._currentFilmOrder = this._getFilms();
+        this._currentFilms = this._getFilms();
         this._popupModelUpdate(data);
         this._clearFilmList();
         this._renderSortMenu();
         this._renderFilmContainer();
-        this._renderFilmList(this._currentFilmOrder);
+        this._renderFilmList(this._currentFilms);
         break;}
     }  }
 
@@ -141,16 +141,16 @@ export default class FilmList {
   _sortFilms(type) {
     switch (type) {
       case SortType.DEFAULT:
-        this._currentFilmOrder = this._getFilms();
-        this._updateFilmList(this._currentFilmOrder);
+        this._currentFilms = this._getFilms();
+        this._updateFilmList(this._currentFilms);
         break;
       case SortType.RATING:
-        this._currentFilmOrder = getTopRatedMovies(this._getFilms());
-        this._updateFilmList(this._currentFilmOrder);
+        this._currentFilms = getTopRatedMovies(this._getFilms());
+        this._updateFilmList(this._currentFilms);
         break;
       case SortType.DATE:
-        this._currentFilmOrder = getNewestMovies(this._getFilms());
-        this._updateFilmList(this._currentFilmOrder);
+        this._currentFilms = getNewestMovies(this._getFilms());
+        this._updateFilmList(this._currentFilms);
         break;
     }
   }
@@ -195,7 +195,7 @@ export default class FilmList {
   }
 
   _renderFilms(films, cardNumber = CardNumber.CARDS_TO_RENDER) {
-    const cardsToRender = Math.min((this._currentFilmOrder.length-this._generatedCardsCount), cardNumber);
+    const cardsToRender = Math.min((this._currentFilms.length-this._generatedCardsCount), cardNumber);
     for (let i = 0; i < cardsToRender; i++) {
       this._renderFilm(films[this._generatedCardsCount]);
       this._generatedCardsCount+=1;
@@ -225,8 +225,8 @@ export default class FilmList {
   }
 
   _handleShowMoreButtonClick() {
-    this._renderFilms(this._currentFilmOrder);
-    if (this._generatedCardsCount >= this._currentFilmOrder.length) {
+    this._renderFilms(this._currentFilms);
+    if (this._generatedCardsCount >= this._currentFilms.length) {
       remove(this._showMoreButtonComponent);
     }
   }

@@ -1,3 +1,4 @@
+import { UpdateType } from '../const';
 import AbstractObserver from '../utils/abstract-observer';
 
 export default class Comments extends AbstractObserver {
@@ -8,10 +9,19 @@ export default class Comments extends AbstractObserver {
 
   set comments(comments) {
     this._comments = comments.slice();
+    this._notify(UpdateType.PATCH, this._comments);
   }
 
   get comments() {
     return this._comments;
+  }
+
+  findComments(sentComments) {
+    const foundComments = [];
+    for (const currentComment of sentComments) {
+      foundComments.push(this.comments.find((modelComment) => modelComment.id === currentComment));
+    }
+    return foundComments;
   }
 
   addComment(updateType, update) {

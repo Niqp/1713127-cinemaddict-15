@@ -3,7 +3,7 @@ import AbstractView from './abstract-view';
 
 const getFilterMenuItem = (filter,currentFilter) => {
   const {type,name,count} = filter;
-  return `<a href="#watchlist" class="main-navigation__item ${type === currentFilter ? 'main-navigation__item--active' : ''}" data-filter-type="${type}">${name} ${name === 'All movies' ? '' : `<span class="main-navigation__item-count" data-filter-type="${type}">${count}</span>`}</a>`;
+  return `<a href="#${type}" class="main-navigation__item ${type === currentFilter ? 'main-navigation__item--active' : ''}" data-filter-type="${type}">${name} ${name === 'All movies' ? '' : `<span class="main-navigation__item-count" data-filter-type="${type}">${count}</span>`}</a>`;
 };
 
 const getMenuTemplate = (filterItems, currentFilter) =>{

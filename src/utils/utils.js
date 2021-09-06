@@ -114,7 +114,7 @@ export const createDurationMinutes = (time) => dayjs.duration(time,'minutes');
 
 export const getTimeFromNow = (date) => date.fromNow();
 
-export const IsTimeAfterDate = (date,afterType) => {
+export const isTimeAfterDate = (date,afterType) => {
   const subtracted = createCurrentDate().subtract(1,afterType);
   return date.isSameOrAfter(subtracted);
 };
@@ -126,17 +126,3 @@ export const generateElements = (elements,template) => {
   });
   return generatedElements;
 };
-
-// export const updateItem = (items, update) => {
-//   const index = items.findIndex((item) => item.id === update.id);
-
-//   if (index === -1) {
-//     return items;
-//   }
-
-//   return [
-//     ...items.slice(0, index),
-//     update,
-//     ...items.slice(index + 1),
-//   ];
-// };
