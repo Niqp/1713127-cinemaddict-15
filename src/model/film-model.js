@@ -25,7 +25,7 @@ export default class Films extends AbstractObserver {
   }
 
   updateFilm (updateType, film, fromComment) {
-    this._api.updateFilm(film,fromComment).then((update) => {
+    return this._api.updateFilm(film,fromComment).then((update) => {
       const index = this._films.findIndex((item) => item.id === update.id);
 
       if (index === -1) {

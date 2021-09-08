@@ -4,7 +4,7 @@ import ButtonShowMore from '../view/button-show-more';
 import SortMenu from '../view/menu-sort';
 import FilmPresenter from './film-presenter';
 import PopupPresenter from './film-popup-presenter';
-import { RenderPosition, CardNumber, NoFilmsMessages, SortType, UserAction, UpdateType } from '../const';
+import { RenderPosition, CardNumber, NoFilmsMessages, SortType, UserAction, UpdateType, ViewState } from '../const';
 import { renderElement, remove } from '../render';
 import { filter, getNewestMovies, getTopRatedMovies} from '../filters';
 import LoadingView from '../view/loading';
@@ -73,15 +73,31 @@ export default class FilmList {
   _handleViewAction(actionType, updateType, update, comment) {
     switch (actionType) {
       case UserAction.ADD_COMMENT:
-        this._commentsModel.addComment(updateType, update, comment);
-        // this._filmsModel.updateFilm(updateType, update);
+        this._currentPopup.setViewState(ViewState.SAVING);
+        this._commentsModel.addComment(updateType, update, comment)
+          .catch(() => {
+            this._currentPopup.setAborting(comment);
+          });
         break;
       case UserAction.REMOVE_COMMENT:
-        this._commentsModel.removeComment(updateType, comment);
-        this._filmsModel.updateFilm(updateType, update);
+        this._currentPopup.setViewState(ViewState.DELETING,comment);
+        this._commentsModel.removeComment(updateType, comment)
+          .then(() => {
+            this._filmsModel.updateFilm(updateType, update);
+          })
+          .catch(() => {
+            this._currentPopup.setCommentAborting(comment);
+          });
         break;
       case UserAction.TOGGLE_PARAMETERS:
-        this._filmsModel.updateFilm(updateType, update);
+        this._filmsModel.updateFilm(updateType, update)
+          .catch(() => {
+            if (this._currentPopup !== null && this._currentPopup.component) {
+              this._currentPopup.setAborting();
+              return;
+            }
+            this._filmPresenter.get(update.id).setAborting();
+          });
         break;
     }
   }
@@ -90,7 +106,7 @@ export default class FilmList {
     if (this._currentPopup !== null) {
       if (this._currentPopup.component && this._currentPopup.component.currentId === data.id) {
         const savedY = this._currentPopup.currentY;
-        this._currentPopup.updatePopup(UpdateType.PATCH,data);
+        this._currentPopup.updatePopup(data);
         this._currentPopup.currentY = savedY;
       }
     }
@@ -109,6 +125,7 @@ export default class FilmList {
         break;}
       case UpdateType.MAJOR:{
         this._currentFilms = this._getFilms();
+        this._currentSortMethod = SortType.DEFAULT;
         this._popupModelUpdate(data);
         this._clearFilmList();
         this._renderSortMenu();
@@ -191,6 +208,8 @@ export default class FilmList {
   _renderFilmList(currentlyRenderedCount = CardNumber.CARDS_TO_RENDER) {
     if (this._currentFilms.length < 1) {
       const selectedFilter = this._filterModel.filter;
+      remove(this._sortMenu);
+      remove(this._filmContainerComponent);
       this._renderFilmEmptyContainer(NoFilmsMessages[selectedFilter]);
       return;
     }

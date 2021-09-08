@@ -12,7 +12,6 @@ export default class Comments extends AbstractObserver {
 
   set comments(comments) {
     this._comments = comments.slice();
-    this._notify(UpdateType.PATCH, this._comments);
   }
 
   get comments() {
@@ -22,18 +21,19 @@ export default class Comments extends AbstractObserver {
   fetchComments(film) {
     return this._api.getComments(film).then((comments) => {
       this.comments = comments;
+      this._notify(UpdateType.PATCH, this._comments);
     });
   }
 
   addComment(updateType, film, comment) {
-    this._api.addComment(film,comment).then((update) => {
+    return this._api.addComment(film,comment).then((update) => {
       this.comments = update.comments.map((currentComment) => Comments.adaptToClient(currentComment));
       this._filmsModel.updateFilm(updateType,update.movie,true);
     });
   }
 
   removeComment(updateType, update) {
-    this._api.removeComment(update).then(() => {
+    return this._api.removeComment(update).then(() => {
       const index = this._comments.findIndex((comment) => comment.id === update);
 
       if (index === -1) {
@@ -44,7 +44,6 @@ export default class Comments extends AbstractObserver {
         ...this._comments.slice(0, index),
         ...this._comments.slice(index + 1),
       ];
-      this._notify(updateType,update);
     });
   }
 

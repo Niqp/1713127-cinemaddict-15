@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import { SHAKE_ANIMATION_TIMEOUT } from '../const';
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
 dayjs.extend(isSameOrAfter);
@@ -106,3 +107,14 @@ export const generateElements = (elements,template) => {
   });
   return generatedElements;
 };
+
+export const shake = (item,callback) => {
+  item.style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+  setTimeout(() => {
+    item.style.animation = '';
+    if (callback) {
+      callback();
+    }
+  }, SHAKE_ANIMATION_TIMEOUT);
+};
+

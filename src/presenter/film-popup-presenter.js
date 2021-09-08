@@ -1,7 +1,7 @@
 import FilmPopupView from '../view/film-popup-view';
 import { remove, replace, renderElement } from '../render';
-import { RenderPosition, UpdateType, UserAction } from '../const';
-import { createCurrentDate } from '../utils/utils';
+import { RenderPosition, UpdateType, UserAction, ViewState } from '../const';
+import { createCurrentDate, shake } from '../utils/utils';
 
 export default class PopupPresenter {
   constructor(updateFilm,commentsModel) {
@@ -14,6 +14,8 @@ export default class PopupPresenter {
     this._handlePopupFavoriteClick = this._handlePopupFavoriteClick.bind(this);
     this._handleNewCommentSend = this._handleNewCommentSend.bind(this);
     this._handleDeleteComment = this._handleDeleteComment.bind(this);
+    this._handleModelEvent = this._handleModelEvent.bind(this);
+    this._updateWithCurrentComment = this._updateWithCurrentComment.bind(this);
     this._updateFilm = updateFilm;
     this._component = null;
     this._comments = null;
@@ -23,8 +25,11 @@ export default class PopupPresenter {
 
   init(film) {
     this.film = film;
-    this._commentsModel.addObserver(this.updatePopup);
-    this._commentsModel.fetchComments(this.film);
+    this._commentsModel.addObserver(this._handleModelEvent);
+    this._commentsModel.fetchComments(this.film)
+      .catch(() => {
+        shake(this._component.getElement());
+      });
     const oldPopupComponent = this._component;
     this._component = new FilmPopupView(this.film, this._comments);
     this._bodyElement.classList.add('hide-overflow');
@@ -60,15 +65,50 @@ export default class PopupPresenter {
     this._comments = null;
     this._bodyElement.classList.remove('hide-overflow');
     document.removeEventListener('keydown',this._handlePopupEscPress);
-    this._commentsModel.removeObserver(this.updatePopup);
+    this._commentsModel.removeObserver(this._handleModelEvent);
   }
 
-  updatePopup(event,film) {
+  updatePopup(data) {
     const currentY = this._component.getElement().scrollTop;
     this._comments = this._commentsModel.comments;
     this._component.comments = this._comments;
-    this._component.updateState(film);
+    this._component.updateState(data);
     this._component.getElement().scrollTo(0,currentY);
+  }
+
+  setAborting(comment) {
+    if (comment) {
+      this._currentComment = comment;
+      shake(this._component.getElement(),this._updateWithCurrentComment);
+      return;
+    }
+    shake(this._component.getElement(),this._handleModelEvent);
+  }
+
+  _updateWithCurrentComment() {
+    this.updatePopup({isSaving: false, isDeleting: false, deletedComment: null, newCommentEmote: this._currentComment.emote, newCommentMessage: this._currentComment.message});
+  }
+
+  setCommentAborting(commentId) {
+    const comment = this._component.getElement().querySelector(`.film-details__comment[data-comment-id="${commentId}"]`);
+    shake(comment,this._handleModelEvent);
+  }
+
+  _handleModelEvent() {
+    this.updatePopup({isSaving: false, isDeleting: false, deletedComment: null});
+  }
+
+  setViewState(state,commentId) {
+    switch (state) {
+      case ViewState.SAVING:{
+        this.updatePopup({isSaving: true});
+        break;
+      }
+      case ViewState.DELETING:{
+        this.updatePopup({isDeleting: true, deletedComment: commentId});
+        break;
+      }
+    }
   }
 
   get currentY() {
@@ -144,12 +184,12 @@ export default class PopupPresenter {
       comment);
   }
 
-  _handleDeleteComment(film,id) {
+  _handleDeleteComment(film,comment) {
     this._updateFilm(
       UserAction.REMOVE_COMMENT,
       UpdateType.PATCH,
       film,
-      id,
+      comment,
     );
   }
 }
