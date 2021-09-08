@@ -1,7 +1,6 @@
-import { createCurrentDate, generateElements, createDurationMinutes, formatDate, getTimeFromNow } from '../utils/utils.js';
+import { generateElements, createDurationMinutes, formatDate, getTimeFromNow } from '../utils/utils.js';
 import { DateFormats, emotes } from '../const.js';
 import SmartView from './smart-view.js';
-import { nanoid } from 'nanoid';
 import he from 'he';
 
 const genreTemplate = (element) => (
@@ -34,7 +33,8 @@ const availableEmotesTemplate = (element) => (
 const getFilmPopupTemplate = (state,comments) => {
   const {poster,title,originalTitle,rating,director,writers,actors,releaseDate,country,duration,genres,ageRestriction,description,isInWatchlist,isWatched,isFavorite,newCommentEmote,newCommentMessage} = state;
   const generatedGenres = generateElements(genres,genreTemplate);
-  const generatedComments = generateElements(comments,commentTemplate);
+  const generatedComments = comments === null ? null : generateElements(comments,commentTemplate);
+
   const generatedEmotes = generateElements(emotes,availableEmotesTemplate);
 
 
@@ -46,9 +46,9 @@ const getFilmPopupTemplate = (state,comments) => {
         </div>
         <div class="film-details__info-wrap">
           <div class="film-details__poster">
-            <img class="film-details__poster-img" src="./images/posters/${poster}" alt="">
+            <img class="film-details__poster-img" src="${poster}" alt="">
 
-            <p class="film-details__age">${ageRestriction}</p>
+            <p class="film-details__age">${ageRestriction}+</p>
           </div>
 
           <div class="film-details__info">
@@ -95,7 +95,7 @@ const getFilmPopupTemplate = (state,comments) => {
             </table>
 
             <p class="film-details__film-description">
-              ${description.join('')}
+              ${description}
             </p>
           </div>
         </div>
@@ -109,10 +109,10 @@ const getFilmPopupTemplate = (state,comments) => {
 
       <div class="film-details__bottom-container">
         <section class="film-details__comments-wrap">
-          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
+          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments === null ? '' : comments.length}</span></h3>
 
           <ul class="film-details__comments-list">
-           ${generatedComments.join('')}
+           ${generatedComments === null ? 'Loading...' : generatedComments.join('')}
           </ul>
 
           <div class="film-details__new-comment">
@@ -219,7 +219,6 @@ export default class FilmPopup extends SmartView {
       ...this._state.comments.slice(index + 1),
     ];
 
-
     this._callback.deleteComment(FilmPopup.parseStateToFilm(this._state),evt.target.dataset.commentId);
   }
 
@@ -272,10 +271,7 @@ export default class FilmPopup extends SmartView {
       evt.preventDefault();
       if (this._state.newCommentEmote && this._state.newCommentMessage) {
         this._newComment = {
-          id: nanoid(),
           emote: this._state.newCommentEmote,
-          date: createCurrentDate(),
-          author: 'Неопознанный Енот',
           message: this._state.newCommentMessage,
         };
         this._state.comments.push(this._newComment.id);

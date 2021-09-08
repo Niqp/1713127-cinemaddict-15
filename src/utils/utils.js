@@ -44,29 +44,7 @@ export const getRandomArrayItems = (items,itemQuantity,deleteFromOriginalArray) 
   return data;
 };
 
-export const createFetch = (link) => fetch(link)
-  .then((response) => {
-    if (response.ok) {
-      return response.json();
-    }
-    throw new Error(`${response.status} ${response.statusText}`);
-  });
-
-export const createSend = (link,body) => fetch(
-  link,
-  {
-    method: 'POST',
-    body,
-  },
-)
-  .then((response) => {
-    if (response.ok) {
-      return response;
-    }
-    throw new Error(`${response.status} ${response.statusText}`);
-  });
-
-// const showAlert = (message) => {
+// export const showAlert = (message) => {
 //   const alertContainer = document.createElement('div');
 //   alertContainer.style.zIndex = 100;
 //   alertContainer.style.position = 'absolute';
@@ -82,7 +60,7 @@ export const createSend = (link,body) => fetch(
 //   alertContainer.textContent = message;
 //   document.body.append(alertContainer);
 
-//   setTimeout(() => {alertContainer.style.transform = 'translateY(0)';},ALERT_ANIMATION_DELAY);
+//   setTimeout(() => {alertContainer.style.transform = 'translateY(0)';},0);
 //   setTimeout(() => {
 //     alertContainer.style.transform = 'translateY(-100%)';
 //     setTimeout(() => {alertContainer.remove();},ALERT_ANIMATION_DELAY);
@@ -106,9 +84,11 @@ export const shuffle = (array) => {
 
 export const createDateWithDayGap = (gap) => dayjs().subtract(gap, 'day');
 
+export const createDateFromString = (date) => dayjs(date);
+
 export const createCurrentDate = () => dayjs();
 
-export const formatDate = (date,format) => date.format(format);
+export const formatDate = (date,format = '') => date.format(format);
 
 export const createDurationMinutes = (time) => dayjs.duration(time,'minutes');
 

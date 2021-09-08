@@ -1,10 +1,13 @@
 import { UpdateType } from '../const';
 import AbstractObserver from '../utils/abstract-observer';
+import { createDateFromString } from '../utils/utils';
 
 export default class Comments extends AbstractObserver {
-  constructor() {
+  constructor(api,filmsModel) {
     super();
     this._comments = [];
+    this._api = api;
+    this._filmsModel = filmsModel;
   }
 
   set comments(comments) {
@@ -16,34 +19,51 @@ export default class Comments extends AbstractObserver {
     return this._comments;
   }
 
-  findComments(sentComments) {
-    const foundComments = [];
-    for (const currentComment of sentComments) {
-      foundComments.push(this.comments.find((modelComment) => modelComment.id === currentComment));
-    }
-    return foundComments;
+  fetchComments(film) {
+    return this._api.getComments(film).then((comments) => {
+      this.comments = comments;
+    });
   }
 
-  addComment(updateType, update) {
-    this._comments = [
-      update,
-      ...this._comments,
-    ];
-
-    this._notify(updateType, update);
+  addComment(updateType, film, comment) {
+    this._api.addComment(film,comment).then((update) => {
+      this.comments = update.comments.map((currentComment) => Comments.adaptToClient(currentComment));
+      this._filmsModel.updateFilm(updateType,update.movie,true);
+    });
   }
 
   removeComment(updateType, update) {
-    const index = this._comments.findIndex((comment) => comment.id === update);
+    this._api.removeComment(update).then(() => {
+      const index = this._comments.findIndex((comment) => comment.id === update);
 
-    if (index === -1) {
-      throw new Error('Can\'t delete unexisting comment');
-    }
+      if (index === -1) {
+        throw new Error('Can\'t delete unexisting comment');
+      }
 
-    this._comments = [
-      ...this._comments.slice(0, index),
-      ...this._comments.slice(index + 1),
-    ];
-    this._notify(updateType);
+      this._comments = [
+        ...this._comments.slice(0, index),
+        ...this._comments.slice(index + 1),
+      ];
+      this._notify(updateType,update);
+    });
+  }
+
+  static adaptToClient(comment) {
+    const adaptedComment = {
+      id: comment.id,
+      author: comment.author,
+      emote: comment.emotion,
+      date: createDateFromString(comment.date),
+      message: comment.comment,
+    };
+    return adaptedComment;
+  }
+
+  static adaptToServer(comment) {
+    const adaptedComment = {
+      comment: comment.message,
+      emotion: comment.emote,
+    };
+    return adaptedComment;
   }
 }

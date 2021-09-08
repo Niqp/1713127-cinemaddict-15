@@ -7,6 +7,7 @@ export default class PopupPresenter {
   constructor(updateFilm,commentsModel) {
     this._commentsModel = commentsModel;
     this.destroy = this.destroy.bind(this);
+    this.updatePopup = this.updatePopup.bind(this);
     this._handlePopupEscPress = this._handlePopupEscPress.bind(this);
     this._handlePopupWatchlistClick = this._handlePopupWatchlistClick.bind(this);
     this._handlePopupWatchedClick = this._handlePopupWatchedClick.bind(this);
@@ -15,13 +16,15 @@ export default class PopupPresenter {
     this._handleDeleteComment = this._handleDeleteComment.bind(this);
     this._updateFilm = updateFilm;
     this._component = null;
+    this._comments = null;
     this._bodyElement = document.querySelector('body');
 
   }
 
   init(film) {
     this.film = film;
-    this._comments = this._commentsModel.findComments(this.film.comments);
+    this._commentsModel.addObserver(this.updatePopup);
+    this._commentsModel.fetchComments(this.film);
     const oldPopupComponent = this._component;
     this._component = new FilmPopupView(this.film, this._comments);
     this._bodyElement.classList.add('hide-overflow');
@@ -54,13 +57,15 @@ export default class PopupPresenter {
   destroy() {
     remove(this._component);
     this._component = null;
+    this._comments = null;
     this._bodyElement.classList.remove('hide-overflow');
     document.removeEventListener('keydown',this._handlePopupEscPress);
+    this._commentsModel.removeObserver(this.updatePopup);
   }
 
-  updatePopup(film) {
+  updatePopup(event,film) {
     const currentY = this._component.getElement().scrollTop;
-    this._comments = this._commentsModel.findComments(film.comments);
+    this._comments = this._commentsModel.comments;
     this._component.comments = this._comments;
     this._component.updateState(film);
     this._component.getElement().scrollTo(0,currentY);

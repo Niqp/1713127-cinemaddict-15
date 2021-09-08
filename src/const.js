@@ -1,3 +1,8 @@
+export const Server = {
+  AUTHORIZATION: 'Basic nikitayupatov021',
+  END_POINT: 'https://15.ecmascript.pages.academy/cinemaddict',
+};
+
 export const RenderPosition = {
   AFTERBEGIN: 'afterbegin',
   BEFOREEND: 'beforeend',
@@ -9,6 +14,7 @@ export const FilterType = {
   HISTORY: 'history',
   FAVORITES: 'favorites',
   NONE: 'none',
+  DISABLED: 'disabled',
 };
 
 export const StateType = {
@@ -49,6 +55,7 @@ export const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
 export const mockFilms = [
