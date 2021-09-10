@@ -1,5 +1,4 @@
-import FilmContainer from './card-container';
-import { Cards } from '../const';
+import AbstractView from './abstract-view';
 
 const getCardMostCommentedTemplate = () => (
   `<section class="films-list films-list--extra">
@@ -9,11 +8,7 @@ const getCardMostCommentedTemplate = () => (
   </section>`
 );
 
-export default class MostCommentedSection extends FilmContainer {
-  constructor(cards,removeAvailable) {
-    super(cards,removeAvailable);
-    this._amount = Cards.EXTRA_CARDS_TO_RENDER;
-  }
+export default class MostCommentedSection extends AbstractView {
 
   getTemplate() {
     return getCardMostCommentedTemplate();

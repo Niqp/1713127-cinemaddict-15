@@ -61,7 +61,7 @@ export default class Films extends AbstractObserver {
       'description': film.film_info.description,
       'isInWatchlist': film.user_details.watchlist,
       'isWatched': film.user_details.already_watched,
-      'watchedDate': createDateFromString(film.user_details.watching_date),
+      'watchedDate': film.user_details.watching_date ? createDateFromString(film.user_details.watching_date) : null,
       'isFavorite': film.user_details.favorite,
     };
 
@@ -92,7 +92,7 @@ export default class Films extends AbstractObserver {
       'user_details': {
         'watchlist': film.isInWatchlist,
         'already_watched': film.isWatched,
-        'watching_date': formatDate(film.watchedDate),
+        'watching_date': film.watchedDate ? formatDate(film.watchedDate) : null,
         'favorite': film.isFavorite,
       },
     };
