@@ -100,8 +100,8 @@ const getFilmPopupTemplate = (state,comments) => {
                 <td class="film-details__cell">${country}</td>
               </tr>
               <tr class="film-details__row">
-                <td class="film-details__term">Genres</td>
-                <td class="film-details__cell">${generatedGenres}
+                <td class="film-details__term">${generatedGenres.length>1 ? 'Genres' : 'Genre'}</td>
+                <td class="film-details__cell">${generatedGenres.join('')}
               </tr>
             </table>
 

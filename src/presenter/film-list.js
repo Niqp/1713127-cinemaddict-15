@@ -266,7 +266,7 @@ export default class FilmList {
       }
       this._currentPopup.destroy();
     }
-    const currentFilm = this._currentFilms.find((film) => film.id === filmId);
+    const currentFilm = this._filmsModel.films.find((film) => film.id === filmId);
     this._currentPopup.init(currentFilm);
   }
 
