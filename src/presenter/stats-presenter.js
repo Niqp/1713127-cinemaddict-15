@@ -44,6 +44,7 @@ export default class StatsPresenter {
   destroy() {
     remove(this._statsComponent);
     this._statsComponent = null;
+    this._statChart.removeElement();
     this._statChart = null;
     this._filmsModel.removeObserver(this._handleModelEvent);
     this._rankModel.removeObserver(this._handleModelEvent);
@@ -93,7 +94,7 @@ export default class StatsPresenter {
       return {
         watched: 0,
         duration: 0,
-        topGenre: 'None',
+        topGenre: '',
       };
     }
     const duration = films.reduce((sum,film) => sum + film.duration,0);

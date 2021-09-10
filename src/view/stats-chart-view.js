@@ -7,6 +7,14 @@ export default class StatsChartView extends AbstractView {
     super();
     this._container= container;
     this._sortedGenres = sortedGenres;
+    this._element = null;
+  }
+
+  removeElement() {
+    if (this._element !== null) {
+      this._element.destroy();
+      this._element = null;
+    }
   }
 
   getStatChart () {
@@ -20,7 +28,7 @@ export default class StatsChartView extends AbstractView {
 
     statisticCtx.height = BAR_HEIGHT * labels.length;
 
-    this._chart = new Chart(statisticCtx, {
+    this._element = new Chart(statisticCtx, {
       plugins: [ChartDataLabels],
       type: 'horizontalBar',
       data: {

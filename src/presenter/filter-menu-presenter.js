@@ -11,21 +11,23 @@ export default class FilterMenuPresenter {
     this._siteStateModel = siteStateModel;
     this._filterMenuComponent = null;
 
-    this._handleModelEvent = this._handleModelEvent.bind(this);
+    this._handleFilmModelEvent = this._handleFilmModelEvent.bind(this);
+    this._handleFilterModelEvent = this._handleFilterModelEvent.bind(this);
     this._handleFilterTypeChange = this._handleFilterTypeChange.bind(this);
     this._handleStatMenuClick = this._handleStatMenuClick.bind(this);
 
-    this._filmsModel.addObserver(this._handleModelEvent);
-    this._filterModel.addObserver(this._handleModelEvent);
+    this._filmsModel.addObserver(this._handleFilmModelEvent);
+    this._filterModel.addObserver(this._handleFilterModelEvent);
 
   }
 
-  init(currentFilter = this._filterModel.getFilter()) {
+  init(currentFilter = this._filterModel.filter) {
     const filters = this._getFilters();
     const oldFilterMenuComponent = this._filterMenuComponent;
     this._filterMenuComponent = new FilterMenu(filters,currentFilter);
-    this._filterMenuComponent.setFilterClickHandler(this._handleFilterTypeChange);
-    this._filterMenuComponent.setStatsClickHandler(this._handleStatMenuClick);
+    if (currentFilter !== FilterType.DISABLED) {
+      this._setHandlers();
+    }
     if (oldFilterMenuComponent === null) {
       renderElement(this._filterContainer,this._filterMenuComponent,RenderPosition.BEFOREEND);
       return;
@@ -34,15 +36,24 @@ export default class FilterMenuPresenter {
     remove(oldFilterMenuComponent);
   }
 
-  _handleModelEvent() {
+  _setHandlers() {
+    this._filterMenuComponent.setFilterClickHandler(this._handleFilterTypeChange);
+    this._filterMenuComponent.setStatsClickHandler(this._handleStatMenuClick);
+  }
+
+  _handleFilmModelEvent() {
     this.init();
   }
 
+  _handleFilterModelEvent(updateType,currentFilter) {
+    this.init(currentFilter);
+  }
+
   _handleFilterTypeChange(filterType) {
-    if (this._filterModel.getFilter() === filterType) {
+    if (this._filterModel.filter === filterType) {
       return;
     }
-    this._filterModel.setFilter(UpdateType.MAJOR,filterType);
+    this._filterModel.filter = filterType;
     if (this._siteStateModel.getState() === StateType.STATS) {
       this._siteStateModel.setState(UpdateType.MAJOR,StateType.FILMS);
     }
@@ -51,7 +62,7 @@ export default class FilterMenuPresenter {
   _handleStatMenuClick() {
     if (this._siteStateModel.getState() !== StateType.STATS) {
       this._siteStateModel.setState(UpdateType.MAJOR,StateType.STATS);
-      this._filterModel.setFilter(UpdateType.MAJOR,FilterType.NONE);
+      this._filterModel.filter = FilterType.NONE;
     }
   }
 

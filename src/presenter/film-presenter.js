@@ -1,7 +1,7 @@
 import CardView from '../view/film-view';
 import { RenderPosition, UpdateType, UserAction } from '../const';
 import { remove, replace, renderElement } from '../render';
-import { createCurrentDate } from '../utils/utils';
+import { createCurrentDate, shake } from '../utils/utils';
 
 export default class FilmPresenter {
   constructor(filmContainer, addPopup, updateFilm) {
@@ -39,6 +39,10 @@ export default class FilmPresenter {
 
   destroy() {
     remove(this._currentFilmComponent);
+  }
+
+  setAborting() {
+    shake(this._currentFilmComponent.getElement());
   }
 
   _setHandlers() {

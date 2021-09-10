@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import { SHAKE_ANIMATION_TIMEOUT } from '../const';
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
 dayjs.extend(isSameOrAfter);
@@ -44,29 +45,7 @@ export const getRandomArrayItems = (items,itemQuantity,deleteFromOriginalArray) 
   return data;
 };
 
-export const createFetch = (link) => fetch(link)
-  .then((response) => {
-    if (response.ok) {
-      return response.json();
-    }
-    throw new Error(`${response.status} ${response.statusText}`);
-  });
-
-export const createSend = (link,body) => fetch(
-  link,
-  {
-    method: 'POST',
-    body,
-  },
-)
-  .then((response) => {
-    if (response.ok) {
-      return response;
-    }
-    throw new Error(`${response.status} ${response.statusText}`);
-  });
-
-// const showAlert = (message) => {
+// export const showAlert = (message) => {
 //   const alertContainer = document.createElement('div');
 //   alertContainer.style.zIndex = 100;
 //   alertContainer.style.position = 'absolute';
@@ -82,7 +61,7 @@ export const createSend = (link,body) => fetch(
 //   alertContainer.textContent = message;
 //   document.body.append(alertContainer);
 
-//   setTimeout(() => {alertContainer.style.transform = 'translateY(0)';},ALERT_ANIMATION_DELAY);
+//   setTimeout(() => {alertContainer.style.transform = 'translateY(0)';},0);
 //   setTimeout(() => {
 //     alertContainer.style.transform = 'translateY(-100%)';
 //     setTimeout(() => {alertContainer.remove();},ALERT_ANIMATION_DELAY);
@@ -106,9 +85,11 @@ export const shuffle = (array) => {
 
 export const createDateWithDayGap = (gap) => dayjs().subtract(gap, 'day');
 
+export const createDateFromString = (date) => dayjs(date);
+
 export const createCurrentDate = () => dayjs();
 
-export const formatDate = (date,format) => date.format(format);
+export const formatDate = (date,format = '') => date.format(format);
 
 export const createDurationMinutes = (time) => dayjs.duration(time,'minutes');
 
@@ -126,3 +107,14 @@ export const generateElements = (elements,template) => {
   });
   return generatedElements;
 };
+
+export const shake = (item,callback) => {
+  item.style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+  setTimeout(() => {
+    item.style.animation = '';
+    if (callback) {
+      callback();
+    }
+  }, SHAKE_ANIMATION_TIMEOUT);
+};
+

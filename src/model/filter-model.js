@@ -1,5 +1,5 @@
 import AbstractObserver from '../utils/abstract-observer.js';
-import { FilterType } from '../const.js';
+import { FilterType, UpdateType } from '../const.js';
 
 export default class Filter extends AbstractObserver {
   constructor() {
@@ -7,12 +7,12 @@ export default class Filter extends AbstractObserver {
     this._activeFilter = FilterType.ALL;
   }
 
-  setFilter(updateType, filter) {
+  set filter(filter) {
     this._activeFilter = filter;
-    this._notify(updateType, filter);
+    this._notify(UpdateType.MAJOR, filter);
   }
 
-  getFilter() {
+  get filter() {
     return this._activeFilter;
   }
 }
