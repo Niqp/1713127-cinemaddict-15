@@ -19,10 +19,11 @@ export default class Comments extends AbstractObserver {
   }
 
   fetchComments(film) {
-    return this._api.getComments(film).then((comments) => {
-      this.comments = comments;
-      this._notify(UpdateType.PATCH, this._comments);
-    });
+    return this._api.getComments(film)
+      .then((comments) => {
+        this.comments = comments;
+        this._notify(UpdateType.PATCH, this._comments);
+      });
   }
 
   addComment(updateType, film, comment) {

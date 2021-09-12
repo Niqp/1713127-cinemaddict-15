@@ -22,6 +22,10 @@ export default class FilterMenuPresenter {
   }
 
   init(currentFilter = this._filterModel.filter) {
+    this._films = this._filmsModel.films;
+    if (this._films === null) {
+      return;
+    }
     const filters = this._getFilters();
     const oldFilterMenuComponent = this._filterMenuComponent;
     this._filterMenuComponent = new FilterMenu(filters,currentFilter);
@@ -67,28 +71,26 @@ export default class FilterMenuPresenter {
   }
 
   _getFilters() {
-    const films = this._filmsModel.films;
-
     return [
       {
         type: FilterType.ALL,
         name: 'All movies',
-        count: filter[FilterType.ALL](films).length,
+        count: filter[FilterType.ALL](this._films).length,
       },
       {
         type: FilterType.WATCHLIST,
         name: 'Watchlist',
-        count: filter[FilterType.WATCHLIST](films).length,
+        count: filter[FilterType.WATCHLIST](this._films).length,
       },
       {
         type: FilterType.HISTORY,
         name: 'History',
-        count: filter[FilterType.HISTORY](films).length,
+        count: filter[FilterType.HISTORY](this._films).length,
       },
       {
         type: FilterType.FAVORITES,
         name: 'Favorites',
-        count: filter[FilterType.FAVORITES](films).length,
+        count: filter[FilterType.FAVORITES](this._films).length,
       },
     ];
   }

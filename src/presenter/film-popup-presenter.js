@@ -16,6 +16,7 @@ export default class PopupPresenter {
     this._handleDeleteComment = this._handleDeleteComment.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._updateWithCurrentComment = this._updateWithCurrentComment.bind(this);
+    this._updateWithServerErrorMessage = this._updateWithServerErrorMessage.bind(this);
     this._updateFilm = updateFilm;
     this._component = null;
     this._comments = null;
@@ -28,7 +29,7 @@ export default class PopupPresenter {
     this._commentsModel.addObserver(this._handleModelEvent);
     this._commentsModel.fetchComments(this.film)
       .catch(() => {
-        shake(this._component.getElement());
+        shake(this._component.getElement(),this._updateWithServerErrorMessage);
       });
     const oldPopupComponent = this._component;
     this._component = new FilmPopupView(this.film, this._comments);
@@ -87,6 +88,10 @@ export default class PopupPresenter {
 
   _updateWithCurrentComment() {
     this.updatePopup({isSaving: false, isDeleting: false, deletedComment: null, newCommentEmote: this._currentComment.emote, newCommentMessage: this._currentComment.message});
+  }
+
+  _updateWithServerErrorMessage() {
+    this.updatePopup({serverError:true,comments: null});
   }
 
   setCommentAborting(commentId) {

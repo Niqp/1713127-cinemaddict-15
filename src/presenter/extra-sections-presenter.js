@@ -12,7 +12,8 @@ export default class ExtraSectionsPresenter {
     this._updateFilm = updateFilm;
     this._filmsModel = filmsModel;
     this._filmPresenters = filmPresenters;
-    this._handleModelEvent = this._handleModelEvent.bind(this);
+    this._getTopRated = this._getTopRated.bind(this);
+    this._getMostCommented = this._getMostCommented.bind(this);
     this._topRatedComponent = null;
     this._mostCommentedComponent = null;
     this._topRatedPresenters = new Map;
@@ -23,69 +24,48 @@ export default class ExtraSectionsPresenter {
 
   init() {
     this._films = this._filmsModel.films;
-    this.initTopRated(this._films);
-    this.initMostCommented(this._films);
-    this._filmsModel.addObserver(this._handleModelEvent);
+    if (this._films === null) {
+      return;
+    }
+    this._topRatedComponent = this.initComponent(this._topRatedComponent,TopRatedSectionView,this._getTopRated);
+    this._mostCommentedComponent = this.initComponent(this._mostCommentedComponent,MostCommentedSectionView,this._getMostCommented);
   }
 
   destroy() {
     this._filmPresenters.forEach((film) => film.destroy());
     this._filmPresenters.clear();
-    this._removeTopRated();
-    this._removeMostCommented();
-    this._filmsModel.removeObserver(this._handleModelEvent);
+    this._removeComponent(this._topRatedComponent);
+    this._removeComponent(this._mostCommentedComponent);
   }
 
-  initTopRated(films) {
+  initComponent(component,view,getComponentFilms) {
+    const filteredFilms = getComponentFilms(this._films);
+    if (filteredFilms.length === 0) {
+      this._removeComponent(component);
+    }
+    const oldComponent = component;
+    component = new view;
+    this._renderContainer(oldComponent,component);
+    this._renderFilms(filteredFilms,component);
+    return component;
+  }
+
+  _removeComponent(component) {
+    if (component) {
+      remove(component);
+      component = null;
+    }
+  }
+
+  _getTopRated(films) {
     this._topRatedFilms = getTopRatedMovies(films).slice(0,CardNumber.EXTRA_CARDS_TO_RENDER);
-    const filmsWithRating = this._topRatedFilms.filter((film) => film.rating !== 0);
-    if (filmsWithRating.length === 0) {
-      if (this._topRatedComponent) {
-        this._removeTopRated();
-      }
-      return;
-    }
-    const oldTopRatedComponent = this._topRatedComponent;
-    this._topRatedComponent = new TopRatedSectionView();
-    this._renderContainer(oldTopRatedComponent,this._topRatedComponent);
-    this._renderFilms(filmsWithRating,this._topRatedComponent);
+    return this._topRatedFilms.filter((film) => film.rating !== 0);
   }
 
-  initMostCommented(films) {
+  _getMostCommented(films) {
     this._mostCommentedFilms = getMostCommentedMovies(films).slice(0,CardNumber.EXTRA_CARDS_TO_RENDER);
-    const filmsWithComments = this._mostCommentedFilms.filter((film) => film.comments.length !== 0);
-    if (filmsWithComments.length === 0) {
-      if (this._mostCommentedComponent) {
-        this._removeMostCommented();
-      }
-      return;
-    }
-    const oldMostCommentedComponent = this._mostCommentedComponent;
-    this._mostCommentedComponent = new MostCommentedSectionView();
-    this._renderContainer(oldMostCommentedComponent,this._mostCommentedComponent);
-    this._renderFilms(filmsWithComments,this._mostCommentedComponent);
+    return this._mostCommentedFilms.filter((film) => film.comments.length !== 0);
   }
-
-  _handleModelEvent() {
-    this._films = this._filmsModel.films;
-    this.initTopRated(this._films);
-    this.initMostCommented(this._films);
-  }
-
-  _removeTopRated() {
-    if (this._topRatedComponent) {
-      remove(this._topRatedComponent);
-      this._topRatedComponent = null;
-    }
-  }
-
-  _removeMostCommented() {
-    if (this._mostCommentedComponent) {
-      remove(this._mostCommentedComponent);
-      this._mostCommentedComponent = null;
-    }
-  }
-
 
   _renderContainer(oldComponent,component) {
     if (oldComponent === null) {
@@ -108,9 +88,4 @@ export default class ExtraSectionsPresenter {
     this._filmPresenters.set(film.id,currentFilm);
     currentFilm.init(film);
   }
-
-  // _clearFilms(presenter) {
-  //   presenter.forEach((film) => film.destroy());
-  //   presenter.clear();
-  // }
 }

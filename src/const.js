@@ -37,6 +37,7 @@ export const NoFilmsMessages = {
   [FilterType.WATCHLIST]: 'There are no movies to watch now.',
   [FilterType.HISTORY]: 'There are no watched movies now.',
   [FilterType.FAVORITES]: 'There are no favorite movies now.',
+  SERVER_ERROR: 'There was an error accessing the movies database, please try again later.',
 };
 
 

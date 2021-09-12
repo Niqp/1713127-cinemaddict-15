@@ -100,7 +100,14 @@ export default class FilmList {
               this._currentPopup.setAborting();
               return;
             }
-            this._filmPresenters.get(update.id).setAborting();
+            const filmPresenter = this._filmPresenters.get(update.id);
+            if (filmPresenter) {
+              filmPresenter.setAborting();
+            }
+            const extraFilmPresenter = this._extraFilmPresenters.get(update.id);
+            if (extraFilmPresenter) {
+              extraFilmPresenter.setAborting();
+            }
           });
         break;
     }
@@ -196,6 +203,12 @@ export default class FilmList {
   }
 
   _renderFilmList(currentlyRenderedCount = CardNumber.CARDS_TO_RENDER) {
+    if (this._currentFilms === null) {
+      remove(this._sortMenu);
+      remove(this._filmContainerComponent);
+      this._renderFilmEmptyContainer(NoFilmsMessages.SERVER_ERROR);
+      return;
+    }
     if (this._currentFilms.length < 1) {
       const selectedFilter = this._filterModel.filter;
       remove(this._sortMenu);

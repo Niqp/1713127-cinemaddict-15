@@ -40,6 +40,10 @@ export default class RankPresenter {
   }
 
   _getRank() {
+    const currentFilms = this._filmsModel.films;
+    if (currentFilms === null) {
+      return;
+    }
     const currentHistoryLength = filter[FilterType.HISTORY](this._filmsModel.films).length;
     for (const rank of Object.values(Ranks)) {
       if (currentHistoryLength >= rank.low && currentHistoryLength <= rank.high) {

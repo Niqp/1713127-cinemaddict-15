@@ -10,7 +10,7 @@ export default class Films extends AbstractObserver {
   }
 
   set films(films) {
-    this._films = films.slice();
+    this._films = films === null ? null : films.slice();
     this._notify(UpdateType.INIT);
   }
 

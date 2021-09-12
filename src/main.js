@@ -27,20 +27,6 @@ const siteRender = () => {
   const siteStateModel = new SiteStateModel();
   const rankModel = new RankModel();
 
-  // const renderedCards = new Array(CardNumber.CARDS_TO_GENERATE)
-  //   .fill()
-  //   .map(() => new Film());
-  // const generatedComments = [];
-  // renderedCards.forEach((film) => {
-  //   film.comments.forEach((id) => generatedComments.push(new Comment(id)));
-  // });
-
-  // const currentTopRatedMovies = getTopRatedMovies(renderedCards);
-  // const currentMostCommentedMovies = getMostCommentedMovies(renderedCards);
-
-  // commentsModel.comments = generatedComments;
-  // filmsModel.films = renderedCards;
-
   const rankPresenter = new RankPresenter(headerElement,rankModel,filmsModel);
   const footerStats = new FooterStatsView();
   rankPresenter.init();
@@ -49,18 +35,6 @@ const siteRender = () => {
     footerStats,
     RenderPosition.BEFOREEND);
 
-  //   const renderExtraSection = (template, cards) => {
-  //     const currentSection = new template(cards,false);
-  //     renderElement(
-  //       films,
-  //       currentSection,
-  //       RenderPosition.BEFOREEND);
-  //     currentSection.renderCards();
-  //   };
-
-  //   renderExtraSection(MostCommentedSectionView, currentTopRatedMovies);
-  //   renderExtraSection(TopRatedSectionView, currentMostCommentedMovies);
-  // };
   const filmListPresenter = new FilmList(mainElement,filmsModel,commentsModel,filterModel,api);
   const statsPresenter = new StatsPresenter(mainElement,filmsModel,rankModel);
   const handleSiteStateChange = (updateType,state) => {
@@ -80,7 +54,12 @@ const siteRender = () => {
   filterMenu.init(FilterType.DISABLED);
   filmListPresenter.init();
 
-  filmsModel.fetchFilms().then(() => footerStats.updateElement(filmsModel.films));
+  filmsModel.fetchFilms()
+    .then(() => footerStats.updateElement(filmsModel.films))
+    .catch(() => filmsModel.films = null);
+  // window.addEventListener('load', () => {
+  //   navigator.serviceWorker.register('/sw.js');
+  // });
 };
 siteRender();
 
