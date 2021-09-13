@@ -1,7 +1,7 @@
 import FilmPopupView from '../view/film-popup-view';
 import { remove, replace, renderElement } from '../render';
-import { RenderPosition, UpdateType, UserAction, ViewState } from '../const';
-import { createCurrentDate, shake } from '../utils/utils';
+import { OfflineCommentErrors, RenderPosition, UpdateType, UserAction, ViewState } from '../const';
+import { createCurrentDate, isOnline, shake, showAlert } from '../utils/utils';
 
 export default class PopupPresenter {
   constructor(updateFilm,commentsModel) {
@@ -91,7 +91,7 @@ export default class PopupPresenter {
   }
 
   _updateWithServerErrorMessage() {
-    this.updatePopup({serverError:true,comments: null});
+    this.updatePopup({serverError:true});
   }
 
   setCommentAborting(commentId) {
@@ -182,6 +182,11 @@ export default class PopupPresenter {
   }
 
   _handleNewCommentSend(film,comment) {
+    if (!isOnline()) {
+      this.setAborting(comment);
+      showAlert(OfflineCommentErrors.ADD);
+      return;
+    }
     this._updateFilm(
       UserAction.ADD_COMMENT,
       UpdateType.PATCH,
@@ -190,6 +195,11 @@ export default class PopupPresenter {
   }
 
   _handleDeleteComment(film,comment) {
+    if (!isOnline()) {
+      this.setAborting();
+      showAlert(OfflineCommentErrors.REMOVE);
+      return;
+    }
     this._updateFilm(
       UserAction.REMOVE_COMMENT,
       UpdateType.PATCH,

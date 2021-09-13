@@ -6,9 +6,8 @@ import { SHAKE_ANIMATION_TIMEOUT } from '../const';
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
 dayjs.extend(isSameOrAfter);
-// const ALERT_SHOW_TIME = 5000;
-// const ALERT_ANIMATION_DELAY = 500;
-const DEBOUNCE_DELAY = 500;
+const ALERT_SHOW_TIME = 3000;
+const ALERT_ANIMATION_DELAY = 500;
 
 export const getRandomInteger = (min, max) => {
   const lower = Math.min(Math.abs(min), Math.abs(max));
@@ -45,43 +44,30 @@ export const getRandomArrayItems = (items,itemQuantity,deleteFromOriginalArray) 
   return data;
 };
 
-// export const showAlert = (message) => {
-//   const alertContainer = document.createElement('div');
-//   alertContainer.style.zIndex = 100;
-//   alertContainer.style.position = 'absolute';
-//   alertContainer.style.left = 0;
-//   alertContainer.style.top = 0;
-//   alertContainer.style.right = 0;
-//   alertContainer.style.padding = '10px 3px';
-//   alertContainer.style.fontSize = '30px';
-//   alertContainer.style.textAlign = 'center';
-//   alertContainer.style.backgroundColor = 'red';
-//   alertContainer.style.transition = 'all 0.5s';
-//   alertContainer.style.transform = 'translateY(-100%)';
-//   alertContainer.textContent = message;
-//   document.body.append(alertContainer);
+export const showAlert = (message) => {
+  const alertContainer = document.createElement('div');
+  alertContainer.style.zIndex = 100;
+  alertContainer.style.position = 'absolute';
+  alertContainer.style.left = 0;
+  alertContainer.style.top = 0;
+  alertContainer.style.right = 0;
+  alertContainer.style.padding = '10px 3px';
+  alertContainer.style.fontSize = '30px';
+  alertContainer.style.textAlign = 'center';
+  alertContainer.style.backgroundColor = 'red';
+  alertContainer.style.transition = 'all 0.5s';
+  alertContainer.style.transform = 'translateY(-100%)';
+  alertContainer.textContent = message;
+  document.body.append(alertContainer);
 
-//   setTimeout(() => {alertContainer.style.transform = 'translateY(0)';},0);
-//   setTimeout(() => {
-//     alertContainer.style.transform = 'translateY(-100%)';
-//     setTimeout(() => {alertContainer.remove();},ALERT_ANIMATION_DELAY);
-//   }, ALERT_SHOW_TIME);
-// };
-
-export function debounce (callback) {
-  let timeoutId;
-  return (...rest) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => callback.apply(this, rest), DEBOUNCE_DELAY);
-  };
-}
-
-export const shuffle = (array) => {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
+  setTimeout(() => {alertContainer.style.transform = 'translateY(0)';},0);
+  setTimeout(() => {
+    alertContainer.style.transform = 'translateY(-100%)';
+    setTimeout(() => {alertContainer.remove();},ALERT_ANIMATION_DELAY);
+  }, ALERT_SHOW_TIME);
 };
+
+export const isOnline = () => window.navigator.onLine;
 
 export const createDateWithDayGap = (gap) => dayjs().subtract(gap, 'day');
 

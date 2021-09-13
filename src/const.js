@@ -5,6 +5,11 @@ export const Server = {
 
 export const DELETE_COMMENT_MESSAGE = 'Deleting...';
 
+export const OfflineCommentErrors = {
+  ADD: 'You can\'t post comments while offline.',
+  REMOVE: 'You can\'t delete comments while offline.',
+};
+
 export const RenderPosition = {
   AFTERBEGIN: 'afterbegin',
   BEFOREEND: 'beforeend',

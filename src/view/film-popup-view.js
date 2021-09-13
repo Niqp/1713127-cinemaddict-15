@@ -131,16 +131,17 @@ const getFilmPopupTemplate = (state,comments) => {
           <ul class="film-details__comments-list">
           ${serverError ? 'Unable to load comments from server, try again later.' : joinedComments}
           </ul>
-
-          <div class="film-details__new-comment">
-            <div class="film-details__add-emoji-label">${newCommentEmote ? `<img src="images/emoji/${newCommentEmote}.png" width="55" height="55" alt="emoji-smile">` : ''}</div>
-              <label class="film-details__comment-label">
-                <textarea class="film-details__comment-input" placeholder="${isSaving ? 'Saving...' : 'Select reaction below and write comment here'}" name="comment" ${isSaving ? 'disabled' : ''}>${newCommentMessage ? he.encode(newCommentMessage) : ''}</textarea>
-              </label>
-              <div class="film-details__emoji-list">
-              ${serverError === true || generatedComments === null ? '' : generatedEmotes.join('')}
-            </div>
+          ${serverError ? '' :
+    `<div class="film-details__new-comment">
+          <div class="film-details__add-emoji-label">${newCommentEmote ? `<img src="images/emoji/${newCommentEmote}.png" width="55" height="55" alt="emoji-smile">` : ''}</div>
+            <label class="film-details__comment-label">
+              <textarea class="film-details__comment-input" placeholder="${isSaving ? 'Saving...' : 'Select reaction below and write comment here'}" name="comment" ${isSaving ? 'disabled' : ''}>${newCommentMessage ? he.encode(newCommentMessage) : ''}</textarea>
+            </label>
+            <div class="film-details__emoji-list">
+            ${generatedEmotes.join('')}
           </div>
+        </div>
+    `}
         </section>
       </div>
     </form>
@@ -208,7 +209,9 @@ export default class FilmPopup extends SmartView {
     for (const emote of this._emotes) {
       emote.addEventListener('click', this._newCommentEmoteChangeHandler);
     }
-    this._textArea.addEventListener('input',this._newCommentTextAreaHandler);
+    if (!this._state.serverError) {
+      this._textArea.addEventListener('input',this._newCommentTextAreaHandler);
+    }
   }
 
   _restoreOuterHandlers() {
@@ -216,8 +219,10 @@ export default class FilmPopup extends SmartView {
     this.setWatchlistHandler(this._callback.watchlistChange);
     this.setWatchedHandler(this._callback.watchedChange);
     this.setFavoriteHandler(this._callback.favoriteChange);
-    this.setCommentSendHandler(this._callback.newCommentSend);
-    this.setCommentDeleteHandler(this._callback.deleteComment);
+    if (!this._state.serverError) {
+      this.setCommentSendHandler(this._callback.newCommentSend);
+      this.setCommentDeleteHandler(this._callback.deleteComment);
+    }
   }
 
   _deleteCommentHandler(evt) {

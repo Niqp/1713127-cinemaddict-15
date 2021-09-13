@@ -21,6 +21,23 @@ self.addEventListener('install', (evt) => {
         '/images/bitmap.png',
         '/images/bitmap@2x.png',
         '/images/bitmap@3x.png',
+        '/images/icons/icon-favorite-active.svg',
+        '/images/icons/icon-favorite.svg',
+        '/images/icons/icon-watched-active.svg',
+        '/images/icons/icon-watched.svg',
+        '/images/icons/icon-watchlist-active.svg',
+        '/images/icons/icon-watchlist.svg',
+        '/images/emoji/angry.png',
+        '/images/emoji/puke.png',
+        '/images/emoji/sleeping.png',
+        '/images/emoji/smile.png',
+        '/images/posters/made-for-each-other.png',
+        '/images/posters/popeye-meets-sinbad.png',
+        '/images/posters/sagebrush-trail.jpg',
+        '/images/posters/santa-claus-conquers-the-martians.jpg',
+        '/images/posters/the-dance-of-life.jpg',
+        '/images/posters/the-great-flamarion.jpg',
+        '/images/posters/the-man-with-the-golden-arm.jpg',
       ])),
   );
 });
@@ -45,7 +62,6 @@ self.addEventListener('activate', (evt) => {
 
 const handleFetch = (evt) => {
   const {request} = evt;
-
   evt.respondWith(
     caches.match(request)
       .then((cacheResponse) => {

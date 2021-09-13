@@ -12,7 +12,9 @@ import SiteStateModel from './model/site-state-model';
 import RankModel from './model/rank-model';
 import RankPresenter from './presenter/rank-presenter';
 import StatsPresenter from './presenter/stats-presenter';
-import Api from './api';
+import Api from './api/api';
+import Store from './api/store';
+import Provider from './api/provider';
 
 const mainElement = document.querySelector('.main');
 const headerElement = document.querySelector('.header');
@@ -20,8 +22,14 @@ const footerElement = document.querySelector('.footer');
 
 
 const siteRender = () => {
+  const STORE_PREFIX = 'taskmanager-localstorage';
+  const STORE_VER = 'v15';
+  const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
+
   const api = new Api(Server.END_POINT,Server.AUTHORIZATION);
-  const filmsModel = new FilmsModel(api);
+  const localStore = new Store(STORE_NAME,window.localStorage);
+  const apiWithProvider = new Provider(api,localStore);
+  const filmsModel = new FilmsModel(apiWithProvider);
   const commentsModel = new CommentsModel(api,filmsModel);
   const filterModel = new FilterModel();
   const siteStateModel = new SiteStateModel();
@@ -35,7 +43,7 @@ const siteRender = () => {
     footerStats,
     RenderPosition.BEFOREEND);
 
-  const filmListPresenter = new FilmList(mainElement,filmsModel,commentsModel,filterModel,api);
+  const filmListPresenter = new FilmList(mainElement,filmsModel,commentsModel,filterModel);
   const statsPresenter = new StatsPresenter(mainElement,filmsModel,rankModel);
   const handleSiteStateChange = (updateType,state) => {
     switch (state) {
@@ -57,9 +65,19 @@ const siteRender = () => {
   filmsModel.fetchFilms()
     .then(() => footerStats.updateElement(filmsModel.films))
     .catch(() => filmsModel.films = null);
-  // window.addEventListener('load', () => {
-  //   navigator.serviceWorker.register('/sw.js');
-  // });
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js');
+    });
+  }
+  window.addEventListener('online', () => {
+    document.title = document.title.replace(' [offline]', '');
+    apiWithProvider.syncFilms();
+  });
+
+  window.addEventListener('offline', () => {
+    document.title += ' [offline]';
+  });
 };
 siteRender();
 
