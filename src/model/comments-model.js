@@ -1,6 +1,7 @@
 import { UpdateType } from '../const';
 import AbstractObserver from '../utils/abstract-observer';
 import { createDateFromString } from '../utils/utils';
+import Films from './film-model';
 
 export default class Comments extends AbstractObserver {
   constructor(api,filmsModel) {
@@ -29,7 +30,7 @@ export default class Comments extends AbstractObserver {
   addComment(updateType, film, comment) {
     return this._api.addComment(film,comment).then((update) => {
       this.comments = update.comments.map((currentComment) => Comments.adaptToClient(currentComment));
-      this._filmsModel.updateFilm(updateType,update.movie,true);
+      this._filmsModel.updateFilm(updateType,Films.adaptToClient(update.movie),true);
     });
   }
 

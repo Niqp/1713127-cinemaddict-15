@@ -135,7 +135,7 @@ const getFilmPopupTemplate = (state,comments) => {
     `<div class="film-details__new-comment">
           <div class="film-details__add-emoji-label">${newCommentEmote ? `<img src="images/emoji/${newCommentEmote}.png" width="55" height="55" alt="emoji-smile">` : ''}</div>
             <label class="film-details__comment-label">
-              <textarea class="film-details__comment-input" placeholder="${isSaving ? 'Saving...' : 'Select reaction below and write comment here'}" name="comment" ${isSaving ? 'disabled' : ''}>${newCommentMessage ? he.encode(newCommentMessage) : ''}</textarea>
+              <textarea class="film-details__comment-input" placeholder="${isSaving ? 'Uploading...' : 'Select reaction below and write comment here'}" name="comment" ${isSaving ? 'disabled' : ''}>${newCommentMessage ? he.encode(newCommentMessage) : ''}</textarea>
             </label>
             <div class="film-details__emoji-list">
             ${generatedEmotes.join('')}

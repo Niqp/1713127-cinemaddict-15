@@ -177,7 +177,7 @@ export default class FilmList {
     if (this._currentPopup !== null) {
       if (this._currentPopup.component && this._currentPopup.component.currentId === data.id) {
         const savedY = this._currentPopup.currentY;
-        this._currentPopup.updatePopup(data);
+        this._currentPopup.updateAfterSaving(data);
         this._currentPopup.currentY = savedY;
       }
     }

@@ -86,6 +86,10 @@ export default class PopupPresenter {
     shake(this._component.getElement(),this._handleModelEvent);
   }
 
+  updateAfterSaving(data) {
+    this.updatePopup({...data, isSaving: false});
+  }
+
   _updateWithCurrentComment() {
     this.updatePopup({isSaving: false, isDeleting: false, deletedComment: null, newCommentEmote: this._currentComment.emote, newCommentMessage: this._currentComment.message});
   }
