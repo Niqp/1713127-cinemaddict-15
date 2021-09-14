@@ -1,5 +1,3 @@
-// import TopRatedSectionView from './view/film-top-rated';
-// import MostCommentedSectionView from './view/film-most-commented';
 import FilmsModel from './model/film-model';
 import FooterStatsView from './view/footer-stats';
 import { RenderPosition, StateType, Server, FilterType } from './const';
@@ -36,8 +34,8 @@ const siteRender = () => {
   const rankModel = new RankModel();
 
   const rankPresenter = new RankPresenter(headerElement,rankModel,filmsModel);
-  const footerStats = new FooterStatsView();
   rankPresenter.init();
+  const footerStats = new FooterStatsView();
   renderElement(
     footerElement,
     footerStats,
