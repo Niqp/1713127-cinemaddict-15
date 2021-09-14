@@ -1,7 +1,7 @@
 import FilmPopupView from '../view/film-popup-view';
 import { remove, replace, renderElement } from '../render';
-import { RenderPosition, UpdateType, UserAction, ViewState } from '../const';
-import { createCurrentDate, shake } from '../utils/utils';
+import { OfflineCommentErrors, RenderPosition, UpdateType, UserAction, ViewState } from '../const';
+import { createCurrentDate, isOnline, shake, showAlert } from '../utils/utils';
 
 export default class PopupPresenter {
   constructor(updateFilm,commentsModel) {
@@ -16,6 +16,7 @@ export default class PopupPresenter {
     this._handleDeleteComment = this._handleDeleteComment.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._updateWithCurrentComment = this._updateWithCurrentComment.bind(this);
+    this._updateWithServerErrorMessage = this._updateWithServerErrorMessage.bind(this);
     this._updateFilm = updateFilm;
     this._component = null;
     this._comments = null;
@@ -28,7 +29,7 @@ export default class PopupPresenter {
     this._commentsModel.addObserver(this._handleModelEvent);
     this._commentsModel.fetchComments(this.film)
       .catch(() => {
-        shake(this._component.getElement());
+        shake(this._component.getElement(),this._updateWithServerErrorMessage);
       });
     const oldPopupComponent = this._component;
     this._component = new FilmPopupView(this.film, this._comments);
@@ -87,6 +88,10 @@ export default class PopupPresenter {
 
   _updateWithCurrentComment() {
     this.updatePopup({isSaving: false, isDeleting: false, deletedComment: null, newCommentEmote: this._currentComment.emote, newCommentMessage: this._currentComment.message});
+  }
+
+  _updateWithServerErrorMessage() {
+    this.updatePopup({serverError:true});
   }
 
   setCommentAborting(commentId) {
@@ -177,6 +182,11 @@ export default class PopupPresenter {
   }
 
   _handleNewCommentSend(film,comment) {
+    if (!isOnline()) {
+      this.setAborting(comment);
+      showAlert(OfflineCommentErrors.ADD);
+      return;
+    }
     this._updateFilm(
       UserAction.ADD_COMMENT,
       UpdateType.PATCH,
@@ -185,6 +195,11 @@ export default class PopupPresenter {
   }
 
   _handleDeleteComment(film,comment) {
+    if (!isOnline()) {
+      this.setAborting();
+      showAlert(OfflineCommentErrors.REMOVE);
+      return;
+    }
     this._updateFilm(
       UserAction.REMOVE_COMMENT,
       UpdateType.PATCH,

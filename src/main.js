@@ -12,7 +12,9 @@ import SiteStateModel from './model/site-state-model';
 import RankModel from './model/rank-model';
 import RankPresenter from './presenter/rank-presenter';
 import StatsPresenter from './presenter/stats-presenter';
-import Api from './api';
+import Api from './api/api';
+import Store from './api/store';
+import Provider from './api/provider';
 
 const mainElement = document.querySelector('.main');
 const headerElement = document.querySelector('.header');
@@ -20,26 +22,18 @@ const footerElement = document.querySelector('.footer');
 
 
 const siteRender = () => {
+  const STORE_PREFIX = 'taskmanager-localstorage';
+  const STORE_VER = 'v15';
+  const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
+
   const api = new Api(Server.END_POINT,Server.AUTHORIZATION);
-  const filmsModel = new FilmsModel(api);
+  const localStore = new Store(STORE_NAME,window.localStorage);
+  const apiWithProvider = new Provider(api,localStore);
+  const filmsModel = new FilmsModel(apiWithProvider);
   const commentsModel = new CommentsModel(api,filmsModel);
   const filterModel = new FilterModel();
   const siteStateModel = new SiteStateModel();
   const rankModel = new RankModel();
-
-  // const renderedCards = new Array(CardNumber.CARDS_TO_GENERATE)
-  //   .fill()
-  //   .map(() => new Film());
-  // const generatedComments = [];
-  // renderedCards.forEach((film) => {
-  //   film.comments.forEach((id) => generatedComments.push(new Comment(id)));
-  // });
-
-  // const currentTopRatedMovies = getTopRatedMovies(renderedCards);
-  // const currentMostCommentedMovies = getMostCommentedMovies(renderedCards);
-
-  // commentsModel.comments = generatedComments;
-  // filmsModel.films = renderedCards;
 
   const rankPresenter = new RankPresenter(headerElement,rankModel,filmsModel);
   const footerStats = new FooterStatsView();
@@ -49,19 +43,7 @@ const siteRender = () => {
     footerStats,
     RenderPosition.BEFOREEND);
 
-  //   const renderExtraSection = (template, cards) => {
-  //     const currentSection = new template(cards,false);
-  //     renderElement(
-  //       films,
-  //       currentSection,
-  //       RenderPosition.BEFOREEND);
-  //     currentSection.renderCards();
-  //   };
-
-  //   renderExtraSection(MostCommentedSectionView, currentTopRatedMovies);
-  //   renderExtraSection(TopRatedSectionView, currentMostCommentedMovies);
-  // };
-  const filmListPresenter = new FilmList(mainElement,filmsModel,commentsModel,filterModel,api);
+  const filmListPresenter = new FilmList(mainElement,filmsModel,commentsModel,filterModel);
   const statsPresenter = new StatsPresenter(mainElement,filmsModel,rankModel);
   const handleSiteStateChange = (updateType,state) => {
     switch (state) {
@@ -80,7 +62,22 @@ const siteRender = () => {
   filterMenu.init(FilterType.DISABLED);
   filmListPresenter.init();
 
-  filmsModel.fetchFilms().then(() => footerStats.updateElement(filmsModel.films));
+  filmsModel.fetchFilms()
+    .then(() => footerStats.updateElement(filmsModel.films))
+    .catch(() => filmsModel.films = null);
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js');
+    });
+  }
+  window.addEventListener('online', () => {
+    document.title = document.title.replace(' [offline]', '');
+    apiWithProvider.syncFilms();
+  });
+
+  window.addEventListener('offline', () => {
+    document.title += ' [offline]';
+  });
 };
 siteRender();
 

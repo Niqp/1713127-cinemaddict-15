@@ -31,23 +31,29 @@ const availableEmotesTemplate = (element) => (
 );
 
 const getFilmPopupTemplate = (state,comments) => {
-  const {poster,title,originalTitle,rating,director,writers,actors,releaseDate,country,duration,genres,ageRestriction,description,isInWatchlist,isWatched,isFavorite,newCommentEmote,newCommentMessage, isSaving, isDeleting, deletedComment} = state;
+  const {poster,title,originalTitle,rating,director,writers,actors,releaseDate,country,duration,genres,ageRestriction,description,isInWatchlist,isWatched,isFavorite,newCommentEmote,newCommentMessage, isSaving, isDeleting, deletedComment, serverError} = state;
+
   const generatedGenres = generateElements(genres,genreTemplate);
+
   const currentComments = isDeleting ? comments.map((comment) => {
     if (comment.id === deletedComment) {
       return {...comment, isDeleting: true};
     }
     return comment;
   }) : comments;
+
   const generatedComments = currentComments === null ? null : generateElements(currentComments,commentTemplate);
+
+  const joinedComments = generatedComments === null ? 'Loading...' : generatedComments.join('');
+
   const currentEmotes = isSaving ? emotes.map((emote) =>  ({...emote, isDisabled: false})) : emotes.map((emote) => {
     if (emote.name === newCommentEmote) {
       return {...emote, isSelected: true};
     }
     return emote;
   });
-  const generatedEmotes = generateElements(currentEmotes,availableEmotesTemplate);
 
+  const generatedEmotes = generateElements(currentEmotes,availableEmotesTemplate);
 
   return `<section class="film-details">
     <form class="film-details__inner" action="" method="get">
@@ -120,21 +126,22 @@ const getFilmPopupTemplate = (state,comments) => {
 
       <div class="film-details__bottom-container">
         <section class="film-details__comments-wrap">
-          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments === null ? '' : comments.length}</span></h3>
+          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${generatedComments === null || serverError === true ?  '' : comments.length}</span></h3>
 
           <ul class="film-details__comments-list">
-           ${generatedComments === null ? 'Loading...' : generatedComments.join('')}
+          ${serverError ? 'Unable to load comments from server, try again later.' : joinedComments}
           </ul>
-
-          <div class="film-details__new-comment">
-            <div class="film-details__add-emoji-label">${newCommentEmote ? `<img src="images/emoji/${newCommentEmote}.png" width="55" height="55" alt="emoji-smile">` : ''}</div>
-              <label class="film-details__comment-label">
-                <textarea class="film-details__comment-input" placeholder="${isSaving ? 'Saving...' : 'Select reaction below and write comment here'}" name="comment" ${isSaving ? 'disabled' : ''}>${newCommentMessage ? he.encode(newCommentMessage) : ''}</textarea>
-              </label>
-              <div class="film-details__emoji-list">
-              ${generatedComments === null ? '' : generatedEmotes.join('')}
-            </div>
+          ${serverError ? '' :
+    `<div class="film-details__new-comment">
+          <div class="film-details__add-emoji-label">${newCommentEmote ? `<img src="images/emoji/${newCommentEmote}.png" width="55" height="55" alt="emoji-smile">` : ''}</div>
+            <label class="film-details__comment-label">
+              <textarea class="film-details__comment-input" placeholder="${isSaving ? 'Saving...' : 'Select reaction below and write comment here'}" name="comment" ${isSaving ? 'disabled' : ''}>${newCommentMessage ? he.encode(newCommentMessage) : ''}</textarea>
+            </label>
+            <div class="film-details__emoji-list">
+            ${generatedEmotes.join('')}
           </div>
+        </div>
+    `}
         </section>
       </div>
     </form>
@@ -202,7 +209,9 @@ export default class FilmPopup extends SmartView {
     for (const emote of this._emotes) {
       emote.addEventListener('click', this._newCommentEmoteChangeHandler);
     }
-    this._textArea.addEventListener('input',this._newCommentTextAreaHandler);
+    if (!this._state.serverError) {
+      this._textArea.addEventListener('input',this._newCommentTextAreaHandler);
+    }
   }
 
   _restoreOuterHandlers() {
@@ -210,8 +219,10 @@ export default class FilmPopup extends SmartView {
     this.setWatchlistHandler(this._callback.watchlistChange);
     this.setWatchedHandler(this._callback.watchedChange);
     this.setFavoriteHandler(this._callback.favoriteChange);
-    this.setCommentSendHandler(this._callback.newCommentSend);
-    this.setCommentDeleteHandler(this._callback.deleteComment);
+    if (!this._state.serverError) {
+      this.setCommentSendHandler(this._callback.newCommentSend);
+      this.setCommentDeleteHandler(this._callback.deleteComment);
+    }
   }
 
   _deleteCommentHandler(evt) {
@@ -327,6 +338,7 @@ export default class FilmPopup extends SmartView {
         isSaving: false,
         isDeleting: false,
         deletedComment: null,
+        serverError: false,
       },
     );
   }
@@ -340,6 +352,7 @@ export default class FilmPopup extends SmartView {
     delete state.isSaving;
     delete state.isDeleting;
     delete state.deletedComment;
+    delete state.serverError;
     return state;
   }
 }
