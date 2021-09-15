@@ -128,14 +128,6 @@ export default class PopupPresenter {
     this._component.getElement().scrollTo(0,newY);
   }
 
-  _generateComments(film) {
-    this._comments = [];
-    film.comments.forEach((comment) => {
-      this._comments.push(this._commentsModel.comments.find((modelComment) => modelComment.id === comment));
-    });
-
-  }
-
   _handlePopupEscPress(evt) {
     if (evt.key === 'Escape') {
       this.destroy();
