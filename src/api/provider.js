@@ -1,17 +1,25 @@
 import FilmsModel from '../model/film-model.js';
 import { isOnline } from '../utils/utils.js';
 
-const createStoreStructure = (items) =>
-  items
-    .reduce((acc, current) => Object.assign({}, acc, {
-      [current.id]: current,
-    }), {});
+const createStoreStructure = (items) => items
+  .reduce((acc, current) => Object.assign({}, acc, {
+    [current.id]: current,
+  }), {});
 
 
 export default class Provider {
   constructor(api, store) {
     this._api = api;
     this._store = store;
+  }
+
+  get offlineUpdated() {
+    return Object.values(this._store.getItems())
+      .filter((item) => item.isOfflineUpdated === true)
+      .map((item) => {
+        delete item.isOfflineUpdated;
+        return item;
+      });
   }
 
   getFilms() {
@@ -38,21 +46,24 @@ export default class Provider {
         });
     }
 
-    this._store.setItem(film.id, FilmsModel.adaptToServer(Object.assign({}, film)));
+    this._store.setItem(film.id, Object.assign({}, FilmsModel.adaptToServer(film), {isOfflineUpdated: true}));
 
     return Promise.resolve(film);
   }
 
   syncFilms() {
     if (isOnline()) {
-      const storeTasks = Object.values(this._store.getItems());
-
+      const storeTasks = this.offlineUpdated;
+      if (storeTasks.length < 1) {
+        return;
+      }
       return this._api.syncFilms(storeTasks)
         .then((response) => {
           const updatedFilms = response.updated;
-          const items = createStoreStructure([...updatedFilms]);
-
-          this._store.setItems(items);
+          updatedFilms.forEach((film) => {
+            const item = createStoreStructure([film]);
+            this._store.setItem(item);
+          });
         });
     }
 
