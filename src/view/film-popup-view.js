@@ -46,11 +46,11 @@ const getFilmPopupTemplate = (state,comments) => {
 
   const joinedComments = generatedComments === null ? 'Loading...' : generatedComments.join('');
 
-  const currentEmotes = isSaving ? emotes.map((emote) =>  ({...emote, isDisabled: false})) : emotes.map((emote) => {
+  const currentEmotes = isSaving ? emotes.map((emote) =>  ({...emote, isDisabled: true})) : emotes.map((emote) => {
     if (emote.name === newCommentEmote) {
-      return {...emote, isSelected: true};
+      return {...emote, isSelected: true, isDisabled: false};
     }
-    return emote;
+    return {...emote, isDisabled: false};
   });
 
   const generatedEmotes = generateElements(currentEmotes,availableEmotesTemplate);

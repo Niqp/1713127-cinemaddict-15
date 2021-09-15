@@ -77,21 +77,15 @@ export const SHAKE_ANIMATION_TIMEOUT = 600;
 export const emotes = [
   {
     name: 'angry',
-    isDisabled: false,
   },
   {
     name: 'puke',
-    isDisabled: false,
   },
-
   {
     name: 'sleeping',
-    isDisabled: false,
   },
-
   {
     name: 'smile',
-    isDisabled: false,
   },
 ];
 
