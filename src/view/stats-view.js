@@ -1,5 +1,5 @@
 import { Ranks, StatFilterType } from '../const';
-import { createDurationMinutes } from '../utils/utils';
+import { showDurationInHours, showDurationMinutesDivision } from '../utils/utils';
 import AbstractView from './abstract-view';
 
 const getStatsTemplate = (stats,rank,activeButton) => {
@@ -40,7 +40,7 @@ const getStatsTemplate = (stats,rank,activeButton) => {
     </li>
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">Total duration</h4>
-      <p class="statistic__item-text">${createDurationMinutes(duration).hours()} <span class="statistic__item-description">h</span> ${createDurationMinutes(duration).minutes()} <span class="statistic__item-description">m</span></p>
+      <p class="statistic__item-text">${showDurationInHours(duration)} <span class="statistic__item-description">h</span> ${showDurationMinutesDivision(duration)} <span class="statistic__item-description">m</span></p>
     </li>
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">Top genre</h4>

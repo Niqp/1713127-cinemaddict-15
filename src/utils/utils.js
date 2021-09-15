@@ -79,6 +79,10 @@ export const formatDate = (date,format = '') => date.format(format);
 
 export const createDurationMinutes = (time) => dayjs.duration(time,'minutes');
 
+export const showDurationInHours = (time) => Math.floor(createDurationMinutes(time).as('hours'));
+
+export const showDurationMinutesDivision = (time) => createDurationMinutes(time).minutes();
+
 export const getTimeFromNow = (date) => date.fromNow();
 
 export const isTimeAfterDate = (date,afterType) => {
