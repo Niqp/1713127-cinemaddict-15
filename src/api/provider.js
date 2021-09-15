@@ -1,11 +1,6 @@
 import FilmsModel from '../model/film-model.js';
 import { isOnline } from '../utils/utils.js';
 
-const getSyncedFilms = (items) =>
-  items
-    .filter(({success}) => success)
-    .map(({payload}) => payload.task);
-
 const createStoreStructure = (items) =>
   items
     .reduce((acc, current) => Object.assign({}, acc, {
@@ -54,7 +49,7 @@ export default class Provider {
 
       return this._api.syncFilms(storeTasks)
         .then((response) => {
-          const updatedFilms = getSyncedFilms(response.updated);
+          const updatedFilms = response.updated;
           const items = createStoreStructure([...updatedFilms]);
 
           this._store.setItems(items);
