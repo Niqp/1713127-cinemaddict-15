@@ -5,3 +5,5 @@
 * OOP and JS Class syntaxis
 * MVP Model and Data-binding
 * Service-workers and localStorage
+
+## Deployed at https://github.com/Niqp/cinemaddict
