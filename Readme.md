@@ -6,4 +6,4 @@
 * MVP Model and Data-binding
 * Service-workers and localStorage
 
-## Deployed at https://github.com/Niqp/cinemaddict
+## Deployed at https://niqp.github.io/cinemaddict/
